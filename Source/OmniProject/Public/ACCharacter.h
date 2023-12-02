@@ -38,12 +38,6 @@ public:
 	//Pointers, Variables and Fields
 	//==============================
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
-	//	USkeletalMeshComponent* SkeletalMesh;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
-	//	UCapsuleComponent* BaseCapsule;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
 		USpringArmComponent* CameraBoom;
 

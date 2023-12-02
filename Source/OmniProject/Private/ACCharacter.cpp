@@ -5,30 +5,27 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h" 
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h" 
 
 AACCharacter::AACCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	////Setup Base Mesh
-	//SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("Base Mesh"));
-	//SetRootComponent(SkeletalMesh);
-
-	////Setup Capsule Component
-	//BaseCapsule = CreateDefaultSubobject<UCapsuleComponent>(FName("Base Collision"));
-	//BaseCapsule->SetCapsuleHalfHeight(44.0f);
-	//BaseCapsule->SetCapsuleRadius(22.0f);
-	//BaseCapsule->SetupAttachment(GetRootComponent());
-
 	//Setup Camera Boom
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("Camera Boom"));
-	CameraBoom->TargetArmLength = 300.0f;
 	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 300.0f;
 
 	//Setup Camera
 	Camera = CreateDefaultSubobject<UCameraComponent>(FName("Camera"));
 	Camera->SetupAttachment(CameraBoom);
-	Camera->bUsePawnControlRotation = false;
+	Camera->bUsePawnControlRotation = true;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+	GetCharacterMovement()->bOrientRotationToMovement;
+	GetCharacterMovement()->RotationRate = FRotator(0, 400.0f, 0);
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
