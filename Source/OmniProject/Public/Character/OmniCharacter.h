@@ -16,14 +16,6 @@ class OMNIPROJECT_API AOmniCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-protected:
-
-	virtual void BeginPlay() override;
-
-	void Move(const FInputActionValue& Value);
-
-	void Look(const FInputActionValue& Value);
-
 public:
 
 	//===========
@@ -61,5 +53,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+protected:
+
+	virtual void BeginPlay() override;
+
+	void Move(const FInputActionValue& Value);
+
+	void Look(const FInputActionValue& Value);
 
 };
