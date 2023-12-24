@@ -2,12 +2,15 @@
 
 
 #include "Character/OmniCharacter.h"
+#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h" 
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "EnhancedInputComponent.h" 
 #include "EnhancedInputSubsystems.h"
+#include "Weapons/OmniWeapon.h"
+#include "Items/OmniItem.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h" 
 
 AOmniCharacter::AOmniCharacter()
@@ -61,7 +64,56 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(InputAction_Move, ETriggerEvent::Triggered, this, &AOmniCharacter::Move);
 		EnhancedInputComponent->BindAction(InputAction_Look, ETriggerEvent::Triggered, this, &AOmniCharacter::Look);
+		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::TryEquipOverlappingWeapon);
 	}
+}
+
+void AOmniCharacter::SetOverlappingItemBegin(AOmniItem* OverlappedItem)
+{
+	//Show prompt to press Equip button
+
+	OverlappingItem = OverlappedItem;
+}
+
+void AOmniCharacter::SetOverlappingItemEnd(AOmniItem* OverlappedItem)
+{
+	//Remove prompt to press Equip button
+
+	OverlappingItem = nullptr;
+}
+
+void AOmniCharacter::SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon)
+{
+	//Show prompt to press Equip button
+
+	OverlappingWeapon = OverlappedWeapon;
+
+	TryEquipOverlappingWeapon();
+}
+
+void AOmniCharacter::SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon)
+{
+	//Remove prompt to press Equip button
+
+	OverlappingWeapon = nullptr;
+}
+
+void AOmniCharacter::TryEquipOverlappingWeapon()
+{
+	if (OverlappingWeapon == nullptr)
+	{
+		return;
+	}
+
+	OverlappingWeapon->SetItemState(EItemState::Equipped);
+
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+	OverlappingWeapon->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("RightHandSocket"));
+}
+
+void AOmniCharacter::TryEquipWeapon(AOmniWeapon* OverlappedWeapon)
+{
+
 }
 
 void AOmniCharacter::Move(const FInputActionValue& Value)

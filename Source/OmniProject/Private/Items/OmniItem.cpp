@@ -1,4 +1,5 @@
 #include "Items/OmniItem.h"
+#include "Character/OmniCharacter.h"
 #include "Components/SphereComponent.h"
 
 AOmniItem::AOmniItem()
@@ -12,6 +13,11 @@ AOmniItem::AOmniItem()
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(FName("Collision Sphere"));
 	SphereComponent->SetupAttachment(GetRootComponent());
 	SphereComponent->SetGenerateOverlapEvents(true);
+}
+
+void AOmniItem::ItemEquipped()
+{
+
 }
 
 void AOmniItem::BeginPlay()
@@ -28,8 +34,7 @@ void AOmniItem::Tick(float DeltaTime)
 
 	GameTime += DeltaTime;
 
-	AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
-	AddActorWorldRotation(FRotator(0.f, TransformedCos(), 0.f));
+	RoutineAsAPickup();
 }
 
 float AOmniItem::TransformedSin()
@@ -47,9 +52,13 @@ void AOmniItem::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 {
 	if (OtherActor)
 	{
-		if (GEngine)
+		if (OtherActor)
 		{
-			GEngine->AddOnScreenDebugMessage(1, 5, FColor::Green, OtherActor->GetName());
+			AOmniCharacter* OmniCharacter = Cast<AOmniCharacter>(OtherActor);
+			if (OmniCharacter)
+			{
+				OmniCharacter->SetOverlappingItemBegin(this);
+			}
 		}
 	}
 }
@@ -58,9 +67,23 @@ void AOmniItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	if (OtherActor)
 	{
-		if (GEngine)
+		if (OtherActor)
 		{
-			GEngine->AddOnScreenDebugMessage(1, 5, FColor::Red, OtherActor->GetName());
+			AOmniCharacter* OmniCharacter = Cast<AOmniCharacter>(OtherActor);
+			if (OmniCharacter)
+			{
+
+			}
 		}
 	}
+}
+
+void AOmniItem::RoutineAsAPickup()
+{
+	if (!IsPickup())
+	{
+		return;
+	}
+	AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
+	AddActorWorldRotation(FRotator(0.f, TransformedCos(), 0.f));
 }

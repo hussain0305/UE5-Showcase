@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "OmniGlobal.h"
 #include "OmniItem.generated.h"
 
 class UStaticMeshComponent;
@@ -15,6 +16,10 @@ class OMNIPROJECT_API AOmniItem : public AActor
 public:	
 
 	AOmniItem();
+
+	//==============================
+	//Pointers, Variables and Fields
+	//==============================
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Item Component")
 		UStaticMeshComponent* StaticMesh;
@@ -34,6 +39,27 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Item Presentation")
 		float TimeConstant = 5.f;
 
+
+	//=========
+	//Functions
+	//=========
+
+	UFUNCTION(BlueprintCallable)
+		virtual void ItemEquipped();
+
+	//==================================
+	//Setters, Getters, Inline Functions
+	//==================================
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE EItemState GetItemState() { return ItemState; }
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE void SetItemState(EItemState NewState) { ItemState = NewState; }
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE bool IsPickup() { return ItemState == EItemState::Pickup; }
+
 protected:
 
 	virtual void BeginPlay() override;	
@@ -41,18 +67,23 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintPure, Category = "Item Presentation")
-	float TransformedSin();
+		float TransformedSin();
 
 	UFUNCTION(BlueprintPure, Category = "Item Presentation")
-	float TransformedCos();
+		float TransformedCos();
 
 	UFUNCTION()
-	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		virtual void RoutineAsAPickup();
 
 private:
+
+	EItemState ItemState = EItemState::Pickup;
 
 	float GameTime;
 };
