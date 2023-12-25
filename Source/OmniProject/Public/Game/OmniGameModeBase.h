@@ -13,5 +13,8 @@ UCLASS()
 class OMNIPROJECT_API AOmniGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	AOmniGameModeBase();
 };

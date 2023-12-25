@@ -12,6 +12,7 @@
 #include "Items/OmniItem.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h" 
+#include "Player/OmniController.h"
 
 AOmniCharacter::AOmniCharacter()
 {
@@ -45,7 +46,7 @@ void AOmniCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (const AOmniController* PlayerController = Cast<AOmniController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
@@ -64,7 +65,7 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(InputAction_Move, ETriggerEvent::Triggered, this, &AOmniCharacter::Move);
 		EnhancedInputComponent->BindAction(InputAction_Look, ETriggerEvent::Triggered, this, &AOmniCharacter::Look);
-		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::TryEquipOverlappingWeapon);
+		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::TryEquipOrUnequipWeapon);
 	}
 }
 
@@ -88,7 +89,7 @@ void AOmniCharacter::SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon)
 
 	OverlappingWeapon = OverlappedWeapon;
 
-	TryEquipOverlappingWeapon();
+	//TryEquipOrUnequipWeapon();
 }
 
 void AOmniCharacter::SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon)
@@ -98,17 +99,31 @@ void AOmniCharacter::SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon)
 	OverlappingWeapon = nullptr;
 }
 
-void AOmniCharacter::TryEquipOverlappingWeapon()
+void AOmniCharacter::TryEquipOrUnequipWeapon()
 {
-	if (OverlappingWeapon == nullptr)
+	if (OverlappingWeapon == nullptr && EquippedWeapon == nullptr)
 	{
 		return;
 	}
+	
+	if (EquippedWeapon != nullptr)
+	{
+		const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
+		EquippedWeapon->StaticMesh->DetachFromComponent(DetachmentRules);
 
-	OverlappingWeapon->SetItemState(EItemState::Equipped);
+		EquippedWeapon->SetItemState(EItemState::Pickup);
+		EquippedWeapon = nullptr;
+	}
 
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	OverlappingWeapon->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("RightHandSocket"));
+	else if (OverlappingWeapon != nullptr)
+	{
+		OverlappingWeapon->SetItemState(EItemState::Equipped);
+
+		const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		OverlappingWeapon->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("RightHandSocket"));
+		EquippedWeapon = OverlappingWeapon;
+		OverlappingWeapon = nullptr;
+	}
 }
 
 void AOmniCharacter::TryEquipWeapon(AOmniWeapon* OverlappedWeapon)

@@ -79,7 +79,7 @@ public:
 		void SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon);
 
 	UFUNCTION()
-		void TryEquipOverlappingWeapon();
+		void TryEquipOrUnequipWeapon();
 
 	UFUNCTION()
 		void TryEquipWeapon(AOmniWeapon* OverlappedWeapon);
@@ -100,5 +100,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 		AOmniWeapon* OverlappingWeapon;
 
-
+	UPROPERTY(VisibleAnywhere)
+		AOmniWeapon* EquippedWeapon;
 };
