@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "OmniCharacter.generated.h"
@@ -11,32 +12,44 @@ class UCameraComponent;
 class UInputComponent;
 class UInputMappingContext;
 class UInputAction;
+class UAttributeSet;
+class UAbilitySystemComponent;
 class AOmniItem;
 class AOmniWeapon;
 
 UCLASS()
-class OMNIPROJECT_API AOmniCharacter : public ACharacter
+class OMNIPROJECT_API AOmniCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	//===========
-	//Constructor
-	//===========
+//===========
+//Constructor
+//===========
 
 	AOmniCharacter();
 
-	//==============================
-	//Pointers, Variables and Fields
-	//==============================
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+//==============================
+//Pointers, Variables and Fields
+//==============================
+
+	//--------
+	// Camera
+	//--------
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
 		USpringArmComponent* CameraBoom;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
 		UCameraComponent* Camera;
 
+	//-------
+	// Input
+	//-------
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputMappingContext* MappingContext;
 
@@ -52,15 +65,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputAction* InputAction_Equip;
 
-	//==================================
-	//Setters, Getters, Inline Functions
-	//==================================
+	//----------------
+	// Ability System
+	//----------------
+
+	UPROPERTY()
+		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY()
+		TObjectPtr<UAttributeSet> AttributeSet;
+	
+//==================================
+//Setters, Getters, Inline Functions
+//==================================
 
 	
 
-	//=========
-	//Functions
-	//=========
+//=========
+//Functions
+//=========
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -95,11 +118,11 @@ protected:
 private:
 
 	UPROPERTY(VisibleAnywhere)
-		AOmniItem* OverlappingItem;
+		AOmniItem* OverlappingItem = nullptr;
 	
 	UPROPERTY(VisibleAnywhere)
-		AOmniWeapon* OverlappingWeapon;
+		AOmniWeapon* OverlappingWeapon = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
-		AOmniWeapon* EquippedWeapon;
+		AOmniWeapon* EquippedWeapon = nullptr;
 };

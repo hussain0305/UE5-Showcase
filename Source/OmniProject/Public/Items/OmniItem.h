@@ -17,9 +17,9 @@ public:
 
 	AOmniItem();
 
-	//==============================
-	//Pointers, Variables and Fields
-	//==============================
+//==============================
+//Pointers, Variables and Fields
+//==============================
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Item Component")
 		UStaticMeshComponent* StaticMesh;
@@ -40,23 +40,23 @@ public:
 		float TimeConstant = 5.f;
 
 
-	//=========
-	//Functions
-	//=========
+//=========
+//Functions
+//=========
 
 	UFUNCTION(BlueprintCallable)
 		virtual void ItemEquipped();
 
-	//==================================
-	//Setters, Getters, Inline Functions
-	//==================================
+	UFUNCTION(BlueprintCallable)
+		void SetItemState(const EItemState NewState);
+
+//==================================
+//Setters, Getters, Inline Functions
+//==================================
 
 	UFUNCTION(BlueprintCallable)
 		FORCEINLINE EItemState GetItemState() { return ItemState; }
-
-	UFUNCTION(BlueprintCallable)
-		FORCEINLINE void SetItemState(EItemState NewState) { ItemState = NewState; }
-
+	
 	UFUNCTION(BlueprintCallable)
 		FORCEINLINE bool IsPickup() { return ItemState == EItemState::Pickup; }
 

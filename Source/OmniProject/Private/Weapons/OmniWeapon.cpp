@@ -19,5 +19,16 @@ void AOmniWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 
 void AOmniWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+	// Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+	if (OtherActor)
+	{
+		if (OtherActor)
+		{
+			AOmniCharacter* OmniCharacter = Cast<AOmniCharacter>(OtherActor);
+			if (OmniCharacter)
+			{
+				OmniCharacter->SetOverlappingWeaponEnd(this);
+			}
+		}
+	}
 }

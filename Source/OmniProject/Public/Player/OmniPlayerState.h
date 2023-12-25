@@ -3,15 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/PlayerState.h"
 #include "OmniPlayerState.generated.h"
 
-/**
- * 
- */
+class UAttributeSet;
+class UAbilitySystemComponent;
+
 UCLASS()
-class OMNIPROJECT_API AOmniPlayerState : public APlayerState
+class OMNIPROJECT_API AOmniPlayerState : public APlayerState, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
+public:
+	AOmniPlayerState();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+protected:
 	
+	UPROPERTY()
+		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY()
+		TObjectPtr<UAttributeSet> AttributeSet;
 };

@@ -6,9 +6,6 @@
 #include "Items/OmniItem.h"
 #include "OmniWeapon.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class OMNIPROJECT_API AOmniWeapon : public AOmniItem
 {

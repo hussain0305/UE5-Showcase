@@ -20,6 +20,21 @@ void AOmniItem::ItemEquipped()
 
 }
 
+void AOmniItem::SetItemState(const EItemState NewState)
+{
+	ItemState = NewState;
+	switch(ItemState)
+	{
+	case EItemState::Equipped:
+		SphereComponent->Deactivate();
+		break;
+	case EItemState::Pickup:
+		SetActorRotation(FRotator(0.f,0.f,0.f));
+		SphereComponent->Activate();
+		break;
+	}
+}
+
 void AOmniItem::BeginPlay()
 {
 	Super::BeginPlay();
@@ -72,7 +87,7 @@ void AOmniItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 			AOmniCharacter* OmniCharacter = Cast<AOmniCharacter>(OtherActor);
 			if (OmniCharacter)
 			{
-
+				OmniCharacter->SetOverlappingItemEnd(this);
 			}
 		}
 	}

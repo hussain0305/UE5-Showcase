@@ -3,7 +3,6 @@
 
 #include "Character/OmniCharacter.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h" 
 #include "Components/StaticMeshComponent.h"
 #include "EnhancedInputComponent.h" 
@@ -35,6 +34,11 @@ AOmniCharacter::AOmniCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0, 400.0f, 0);
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+}
+
+UAbilitySystemComponent* AOmniCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 void AOmniCharacter::BeginPlay()
@@ -88,8 +92,6 @@ void AOmniCharacter::SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon)
 	//Show prompt to press Equip button
 
 	OverlappingWeapon = OverlappedWeapon;
-
-	//TryEquipOrUnequipWeapon();
 }
 
 void AOmniCharacter::SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon)
@@ -110,13 +112,17 @@ void AOmniCharacter::TryEquipOrUnequipWeapon()
 	{
 		const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
 		EquippedWeapon->StaticMesh->DetachFromComponent(DetachmentRules);
-
+	
 		EquippedWeapon->SetItemState(EItemState::Pickup);
 		EquippedWeapon = nullptr;
 	}
 
-	else if (OverlappingWeapon != nullptr)
+	if (OverlappingWeapon != nullptr)
 	{
+		if(GEngine)
+		{  
+			GEngine->AddOnScreenDebugMessage(1, 5, FColor::Red, TEXT("EQUIPPED WEAPON"));
+		}
 		OverlappingWeapon->SetItemState(EItemState::Equipped);
 
 		const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
