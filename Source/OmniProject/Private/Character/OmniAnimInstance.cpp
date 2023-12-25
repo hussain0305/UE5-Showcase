@@ -18,6 +18,10 @@ void UOmniAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
+	if (OmniCharacter)
+	{
+		CharacterState = OmniCharacter->GetCharacterState();
+	}
 	if (OmniCharacterMovement)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(OmniCharacterMovement->Velocity);

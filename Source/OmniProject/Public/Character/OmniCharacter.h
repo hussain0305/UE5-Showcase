@@ -4,6 +4,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "OmniGlobal.h"
 #include "OmniCharacter.generated.h"
 
 class UCapsuleComponent;
@@ -79,7 +80,7 @@ public:
 //Setters, Getters, Inline Functions
 //==================================
 
-	
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;}
 
 //=========
 //Functions
@@ -125,4 +126,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 		AOmniWeapon* EquippedWeapon = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+		ECharacterState CharacterState = ECharacterState::Unequipped;
 };

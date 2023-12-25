@@ -55,10 +55,10 @@ public:
 //==================================
 
 	UFUNCTION(BlueprintCallable)
-		FORCEINLINE EItemState GetItemState() { return ItemState; }
+		FORCEINLINE EItemState GetItemState() const { return ItemState; }
 	
 	UFUNCTION(BlueprintCallable)
-		FORCEINLINE bool IsPickup() { return ItemState == EItemState::Pickup; }
+		FORCEINLINE bool IsPickup() const { return ItemState == EItemState::Pickup; }
 
 protected:
 

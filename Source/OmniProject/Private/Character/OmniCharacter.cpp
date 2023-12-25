@@ -115,20 +115,20 @@ void AOmniCharacter::TryEquipOrUnequipWeapon()
 	
 		EquippedWeapon->SetItemState(EItemState::Pickup);
 		EquippedWeapon = nullptr;
+
+		CharacterState = ECharacterState::Unequipped;
 	}
 
 	if (OverlappingWeapon != nullptr)
 	{
-		if(GEngine)
-		{  
-			GEngine->AddOnScreenDebugMessage(1, 5, FColor::Red, TEXT("EQUIPPED WEAPON"));
-		}
 		OverlappingWeapon->SetItemState(EItemState::Equipped);
 
 		const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 		OverlappingWeapon->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("RightHandSocket"));
 		EquippedWeapon = OverlappingWeapon;
 		OverlappingWeapon = nullptr;
+
+		CharacterState = ECharacterState::OneHandedWeapon;
 	}
 }
 

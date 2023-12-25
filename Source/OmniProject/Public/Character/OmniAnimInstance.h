@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "OmniGlobal.h"
 #include "OmniAnimInstance.generated.h"
 
 class AOmniCharacter;
@@ -13,22 +14,25 @@ class OMNIPROJECT_API UOmniAnimInstance : public UAnimInstance
 	
 public:
 
-	//==============================
-	//Pointers, Variables and Fields
-	//==============================
+//==============================
+//Pointers, Variables and Fields
+//==============================
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		AOmniCharacter* OmniCharacter;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
 		class UCharacterMovementComponent* OmniCharacterMovement;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
 		float GroundSpeed;
 
-	//=========
-	//Functions
-	//=========
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Character State")
+		ECharacterState CharacterState;
+
+//=========
+//Functions
+//=========
 
 	virtual void NativeInitializeAnimation() override;
 
