@@ -20,22 +20,18 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		AOmniCharacter* OmniCharacter;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
 		class UCharacterMovementComponent* OmniCharacterMovement;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
 		float GroundSpeed;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Character State")
-		ECharacterState CharacterState;
+		ECharacterWieldState CharacterWieldState;
 
 //=========
 //Functions
 //=========
 
 	virtual void NativeInitializeAnimation() override;
-
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
 };

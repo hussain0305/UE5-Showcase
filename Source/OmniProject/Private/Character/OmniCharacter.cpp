@@ -12,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h" 
 #include "Player/OmniController.h"
+#include "Animation/AnimMontage.h"
 
 AOmniCharacter::AOmniCharacter()
 {
@@ -70,6 +71,7 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_Move, ETriggerEvent::Triggered, this, &AOmniCharacter::Move);
 		EnhancedInputComponent->BindAction(InputAction_Look, ETriggerEvent::Triggered, this, &AOmniCharacter::Look);
 		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::TryEquipOrUnequipWeapon);
+		EnhancedInputComponent->BindAction(InputAction_Attack_PrimaryAction, ETriggerEvent::Triggered, this, &AOmniCharacter::TryAttack_PrimaryAction);
 	}
 }
 
@@ -116,7 +118,7 @@ void AOmniCharacter::TryEquipOrUnequipWeapon()
 		EquippedWeapon->SetItemState(EItemState::Pickup);
 		EquippedWeapon = nullptr;
 
-		CharacterState = ECharacterState::Unequipped;
+		CharacterWieldState = ECharacterWieldState::Unequipped;
 	}
 
 	if (OverlappingWeapon != nullptr)
@@ -128,13 +130,36 @@ void AOmniCharacter::TryEquipOrUnequipWeapon()
 		EquippedWeapon = OverlappingWeapon;
 		OverlappingWeapon = nullptr;
 
-		CharacterState = ECharacterState::OneHandedWeapon;
+		CharacterWieldState = ECharacterWieldState::OneHandedWeapon;
 	}
 }
 
 void AOmniCharacter::TryEquipWeapon(AOmniWeapon* OverlappedWeapon)
 {
 
+}
+
+void AOmniCharacter::TryAttack_PrimaryAction()
+{
+	if (!GetCanAttackPrimaryAction())
+	{
+		return;
+	}
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		const int32 SectionToPlay = FMath::RandRange(1,4);
+		std::string SectionName = "Attack";
+		SectionName += std::to_string(SectionToPlay);
+		AnimInstance->Montage_Play(AttackMontage);
+		AnimInstance->Montage_JumpToSection(FName(SectionName.c_str()), AttackMontage);
+		SetCharacterActionState(ECharacterActionState::Attacking_PrimaryAction);
+	}
+}
+
+void AOmniCharacter::AttackEnded()
+{
+	SetCharacterActionState(ECharacterActionState::Idle);
 }
 
 void AOmniCharacter::Move(const FInputActionValue& Value)

@@ -20,7 +20,7 @@ void UOmniAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	if (OmniCharacter)
 	{
-		CharacterState = OmniCharacter->GetCharacterState();
+		CharacterWieldState = OmniCharacter->GetCharacterWieldState();
 	}
 	if (OmniCharacterMovement)
 	{

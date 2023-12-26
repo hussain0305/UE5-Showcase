@@ -5,11 +5,19 @@
 #include "OmniGlobal.generated.h"
 
 UENUM(BlueprintType)
-enum class ECharacterState : uint8
+enum class ECharacterWieldState : uint8
 {
 	Unequipped			UMETA(DisplayName = "Unequipped"),
 	OneHandedWeapon		UMETA(DisplayName = "One-Handed Weapon"),
 	TwoHandedWeapon		UMETA(DisplayName = "Two-Handed Weapon")
+};
+
+UENUM(BlueprintType)
+enum class ECharacterActionState : uint8
+{
+	Idle						UMETA(DisplayName = "Idle"),
+	Attacking_PrimaryAction		UMETA(DisplayName = "Attacking - Primary Action"),
+	Attacking_SecondaryAction	UMETA(DisplayName = "Attacking - Secondary Action")
 };
 
 UENUM(BlueprintType)
