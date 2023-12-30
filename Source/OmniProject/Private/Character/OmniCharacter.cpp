@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h" 
 #include "Player/OmniController.h"
 #include "Animation/AnimMontage.h"
+#include "DebugMacros.h"
 
 AOmniCharacter::AOmniCharacter()
 {
@@ -153,6 +154,7 @@ void AOmniCharacter::TryAttack_PrimaryAction()
 		SectionName += std::to_string(SectionToPlay);
 		AnimInstance->Montage_Play(AttackMontage);
 		AnimInstance->Montage_JumpToSection(FName(SectionName.c_str()), AttackMontage);
+		PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString(SectionName.c_str()));
 		SetCharacterActionState(ECharacterActionState::Attacking_PrimaryAction);
 	}
 }
