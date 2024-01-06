@@ -61,6 +61,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputAction* InputAction_Equip;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+		UInputAction* InputAction_Sheath;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputAction* InputAction_Attack_PrimaryAction;
 
 	//----------------
@@ -88,6 +90,7 @@ public:
 	FORCEINLINE ECharacterWieldState GetCharacterWieldState() const { return CharacterWieldState;}
 	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
 	FORCEINLINE bool GetCharacterIsWieldingWeapon() const { return CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetCharacterIsOverlappingWeapon() const { return OverlappingWeapon != nullptr;}
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
 	FORCEINLINE bool GetCanAttackPrimaryAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 
@@ -121,7 +124,11 @@ protected:
 	UFUNCTION()
 		void TryEquipOrUnequipWeapon();
 	UFUNCTION()
-		void TryEquipWeapon(AOmniWeapon* OverlappedWeapon);
+		void EquipWeapon(AOmniWeapon* OverlappedWeapon);
+	UFUNCTION()
+		void UnequipWeapon();
+	UFUNCTION()
+		void TrySheathOrUnsheath();
 	UFUNCTION()
 		void TryAttack_PrimaryAction();
 

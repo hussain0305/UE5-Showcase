@@ -6,10 +6,18 @@
 #include "Items/OmniItem.h"
 #include "OmniWeapon.generated.h"
 
+class UStaticMeshComponent;
+
 UCLASS()
 class OMNIPROJECT_API AOmniWeapon : public AOmniItem
 {
 	GENERATED_BODY()
+
+public:
+	AOmniWeapon();
+	
+	UPROPERTY(EditAnywhere, Category = "Character Item Component")
+		TObjectPtr<UStaticMeshComponent> SheathMesh;
 	
 protected:
 
