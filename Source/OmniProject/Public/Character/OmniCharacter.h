@@ -82,13 +82,12 @@ public:
 //==================================
 //Setters, Getters, Inline Functions
 //==================================
-
 	UFUNCTION(BlueprintPure)
-		FORCEINLINE ECharacterWieldState GetCharacterWieldState() const { return CharacterWieldState;}
-	UFUNCTION(BlueprintPure)
-		FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
-	UFUNCTION(BlueprintPure)
-		FORCEINLINE bool GetCharacterIsWieldingWeapon() const { return CharacterWieldState != ECharacterWieldState::Unequipped;}
+		bool BP_GetCharacterIsWieldingWeapon() const { return GetCharacterIsWieldingWeapon();}
+	
+	FORCEINLINE ECharacterWieldState GetCharacterWieldState() const { return CharacterWieldState;}
+	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
+	FORCEINLINE bool GetCharacterIsWieldingWeapon() const { return CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
 	FORCEINLINE bool GetCanAttackPrimaryAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 
