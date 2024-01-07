@@ -89,6 +89,7 @@ public:
 	UFUNCTION(BlueprintPure)
 		bool BP_GetCharacterIsWieldingWeapon() const { return GetCharacterIsWieldingWeapon();}
 
+	void SetCharacterWieldState(const TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon);
 	FORCEINLINE ECharacterWieldState GetCharacterWieldState() const { return CharacterWieldState;}
 	FORCEINLINE bool GetCharacterIsWieldingWeapon() const { return CharacterWieldState != ECharacterWieldState::Unequipped;}
 

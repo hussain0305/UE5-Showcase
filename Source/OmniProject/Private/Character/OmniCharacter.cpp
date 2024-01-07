@@ -153,7 +153,7 @@ void AOmniCharacter::EquipWeapon(AOmniWeapon* OverlappedWeapon)
 
 	EquippedWeapon = OverlappedWeapon;
 	GetInventory()->SetCarriedWeapon(EquippedWeapon);
-	CharacterWieldState = ECharacterWieldState::OneHandedWeapon;
+	SetCharacterWieldState(EquippedWeapon);
 }
 
 void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
@@ -171,12 +171,30 @@ void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
 
 	EquippedWeapon = nullptr;
 	GetInventory()->SetCarriedWeapon(DroppedWeaponType, nullptr);
-	CharacterWieldState = ECharacterWieldState::Unequipped;
+	SetCharacterWieldState(nullptr);
 }
 
 void AOmniCharacter::TrySheathOrUnsheath()
 {
 	
+}
+
+void AOmniCharacter::SetCharacterWieldState(const TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon)
+{
+	if (CurrentlyWieldedWeapon == nullptr)
+	{
+		CharacterWieldState = ECharacterWieldState::Unequipped;
+		return;
+	}
+	switch(CurrentlyWieldedWeapon->WeaponType)
+	{
+		case EWeaponType::OneHandedWeapon:
+			CharacterWieldState = ECharacterWieldState::OneHandedWeapon;
+			break;
+		case EWeaponType::TwoHandedWeapon:
+			CharacterWieldState=ECharacterWieldState::TwoHandedWeapon;
+			break;
+	}
 }
 
 void AOmniCharacter::TryAttack_PrimaryAction()
