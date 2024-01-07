@@ -14,6 +14,7 @@
 #include "Player/OmniController.h"
 #include "Animation/AnimMontage.h"
 #include "DebugMacros.h"
+#include "Components/SphereComponent.h"
 
 AOmniCharacter::AOmniCharacter()
 {
@@ -29,12 +30,16 @@ AOmniCharacter::AOmniCharacter()
 	Camera->SetupAttachment(CameraBoom);
 	Camera->bUsePawnControlRotation = true;
 
+	//Controller
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 	GetCharacterMovement()->bOrientRotationToMovement;
 	GetCharacterMovement()->RotationRate = FRotator(0, 400.0f, 0);
 
+	//Initialize Supporting stuff
+	Inventory = CreateDefaultSubobject<UOmniInventory>(FName("Inventory"));
+	
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
@@ -71,8 +76,8 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(InputAction_Move, ETriggerEvent::Triggered, this, &AOmniCharacter::Move);
 		EnhancedInputComponent->BindAction(InputAction_Look, ETriggerEvent::Triggered, this, &AOmniCharacter::Look);
-		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::TryEquipOrUnequipWeapon);
-		EnhancedInputComponent->BindAction(InputAction_Sheath, ETriggerEvent::Triggered, this, &AOmniCharacter::TryEquipOrUnequipWeapon);
+		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::TryPickupWeapon);
+		EnhancedInputComponent->BindAction(InputAction_Sheath, ETriggerEvent::Triggered, this, &AOmniCharacter::TryPickupWeapon);
 		EnhancedInputComponent->BindAction(InputAction_Attack_PrimaryAction, ETriggerEvent::Triggered, this, &AOmniCharacter::TryAttack_PrimaryAction);
 	}
 }
@@ -94,33 +99,39 @@ void AOmniCharacter::SetOverlappingItemEnd(AOmniItem* OverlappedItem)
 void AOmniCharacter::SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon)
 {
 	//Show prompt to press Equip button
-
-	OverlappingWeapon = OverlappedWeapon;
+	if (OverlappedWeapon->GetItemState() == EItemState::Pickup)
+	{
+		OverlappingWeapon = OverlappedWeapon;
+	}
 }
 
 void AOmniCharacter::SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon)
 {
 	//Remove prompt to press Equip button
 
-	OverlappingWeapon = nullptr;
+	if (OverlappedWeapon == OverlappingWeapon)
+	{
+		OverlappingWeapon = nullptr;
+	}
 }
 
-void AOmniCharacter::TryEquipOrUnequipWeapon()
+void AOmniCharacter::TryPickupWeapon()
 {
-	if (OverlappingWeapon == nullptr && EquippedWeapon == nullptr)
-	{
-		return;
-	}
+	//Is wielding a weapon which is NOT the same type as overlapping weapon - holster the current weapon, pickup overlapping
+	//Is wielding or has a weapon stowed away which is the same type as overlapping weapon - drop current weapon, pickup new
+	const TObjectPtr<AOmniWeapon> WeaponToPickup = OverlappingWeapon;
 	
-	if (GetCharacterIsWieldingWeapon())
-	{
-		UnequipWeapon();
-		return;
-	}
-
 	if (GetCharacterIsOverlappingWeapon())
 	{
-		EquipWeapon(OverlappingWeapon);
+		if (GetInventory()->GetHasWeaponOfType(OverlappingWeapon))
+		{
+			TObjectPtr<AOmniWeapon> WeaponToDrop = GetInventory()->GetCurrentlyCarriedWeaponOfType(OverlappingWeapon);
+			if(WeaponToDrop != nullptr)
+			{
+				DropWeapon(WeaponToDrop);
+			}
+		}
+		EquipWeapon(WeaponToPickup);
 		
 		//Placed OverlappingWeapon = nullptr because later, I might add a mechanic where weapons are acquired from other sources rather than overlapping,
 		//so I might not want to set it to nullptr in every case
@@ -134,33 +145,32 @@ void AOmniCharacter::EquipWeapon(AOmniWeapon* OverlappedWeapon)
 	{
 		return;
 	}
-	
 	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("Equipping Weapon"));
 
 	OverlappedWeapon->SetItemState(EItemState::Equipped);
-
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	OverlappedWeapon->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("RightHandSocket"));
-	EquippedWeapon = OverlappedWeapon;
 
+	EquippedWeapon = OverlappedWeapon;
+	GetInventory()->SetCarriedWeapon(EquippedWeapon);
 	CharacterWieldState = ECharacterWieldState::OneHandedWeapon;
 }
 
-void AOmniCharacter::UnequipWeapon()
+void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
 {
-	if (EquippedWeapon == nullptr)
+	if (WeaponToDrop == nullptr)
 	{
 		return;
 	}
-	
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("Unequipping Weapon"));
+	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("Dropping Weapon"));
 	
 	const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
-	EquippedWeapon->StaticMesh->DetachFromComponent(DetachmentRules);
-	
-	EquippedWeapon->SetItemState(EItemState::Pickup);
-	EquippedWeapon = nullptr;
+	WeaponToDrop->StaticMesh->DetachFromComponent(DetachmentRules);
+	WeaponToDrop->SetItemState(EItemState::Pickup);
+	const EWeaponType DroppedWeaponType = WeaponToDrop->WeaponType;
 
+	EquippedWeapon = nullptr;
+	GetInventory()->SetCarriedWeapon(DroppedWeaponType, nullptr);
 	CharacterWieldState = ECharacterWieldState::Unequipped;
 }
 

@@ -18,6 +18,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Character Item Component")
 		TObjectPtr<UStaticMeshComponent> SheathMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
+		EWeaponType WeaponType;
 	
 protected:
 

@@ -5,8 +5,11 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "OmniGlobal.h"
+#include "Player/OmniInventory.h"
+#include "Weapons/OmniWeapon.h"
 #include "OmniCharacter.generated.h"
 
+class UAnimMontage;
 class UCapsuleComponent;
 class USpringArmComponent;
 class UCameraComponent;
@@ -15,9 +18,9 @@ class UInputMappingContext;
 class UInputAction;
 class UAttributeSet;
 class UAbilitySystemComponent;
+class UOmniInventory;
 class AOmniItem;
 class AOmniWeapon;
-class UAnimMontage;
 
 UCLASS()
 class OMNIPROJECT_API AOmniCharacter : public ACharacter, public IAbilitySystemInterface
@@ -29,7 +32,6 @@ public:
 //===========
 //Constructor
 //===========
-
 	AOmniCharacter();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -40,7 +42,6 @@ public:
 	//--------
 	// Camera
 	//--------
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
 		USpringArmComponent* CameraBoom;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
@@ -49,7 +50,6 @@ public:
 	//-------
 	// Input
 	//-------
-	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputMappingContext* MappingContext;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
@@ -68,7 +68,6 @@ public:
 	//----------------
 	// Ability System
 	//----------------
-
 	UPROPERTY()
 		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
@@ -77,22 +76,38 @@ public:
 	//-------------------
 	// Animation Montages
 	//-------------------
-
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		UAnimMontage* AttackMontage;
 
 //==================================
 //Setters, Getters, Inline Functions
 //==================================
+
+	//--------------------------------------------------------------------------------------
+	// Wielding Helpers - Weapon currently being wielded by the character, NOT being carried
+	//--------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintPure)
 		bool BP_GetCharacterIsWieldingWeapon() const { return GetCharacterIsWieldingWeapon();}
-	
+
 	FORCEINLINE ECharacterWieldState GetCharacterWieldState() const { return CharacterWieldState;}
-	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
 	FORCEINLINE bool GetCharacterIsWieldingWeapon() const { return CharacterWieldState != ECharacterWieldState::Unequipped;}
-	FORCEINLINE bool GetCharacterIsOverlappingWeapon() const { return OverlappingWeapon != nullptr;}
+
+	//---------------------------------------------------------------------
+	// Inventory Helpers - Weapons currently being carried by the character
+	//---------------------------------------------------------------------
+	FORCEINLINE TObjectPtr<UOmniInventory> GetInventory() const {return Inventory;}
+
+	//---------------
+	// Action Helpers
+	//---------------
+	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
 	FORCEINLINE bool GetCanAttackPrimaryAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	
+	//-------
+	// Others
+	//-------
+	FORCEINLINE bool GetCharacterIsOverlappingWeapon() const { return OverlappingWeapon != nullptr;}
 
 //=========
 //Functions
@@ -118,15 +133,14 @@ protected:
 	//-------------------------
 	// Input Handling Functions
 	//-------------------------
-
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	UFUNCTION()
-		void TryEquipOrUnequipWeapon();
+		void TryPickupWeapon();
 	UFUNCTION()
 		void EquipWeapon(AOmniWeapon* OverlappedWeapon);
 	UFUNCTION()
-		void UnequipWeapon();
+		void DropWeapon(AOmniWeapon* WeaponToDrop);
 	UFUNCTION()
 		void TrySheathOrUnsheath();
 	UFUNCTION()
@@ -148,4 +162,6 @@ private:
 		ECharacterWieldState CharacterWieldState = ECharacterWieldState::Unequipped;
 	UPROPERTY(VisibleAnywhere)
 		ECharacterActionState CharacterActionState = ECharacterActionState::Idle;
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<UOmniInventory> Inventory;
 };
