@@ -17,7 +17,7 @@ public:
 	AOmniWeapon();
 	
 	UPROPERTY(EditAnywhere, Category = "Character Item Component")
-		TObjectPtr<UStaticMeshComponent> SheathMesh;
+		TObjectPtr<UStaticMeshComponent> ScabbardMesh;
 
 	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
 		EWeaponType WeaponType;

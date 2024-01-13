@@ -150,7 +150,8 @@ void AOmniCharacter::EquipWeapon(AOmniWeapon* OverlappedWeapon)
 	OverlappedWeapon->SetItemState(EItemState::Equipped);
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	OverlappedWeapon->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("RightHandSocket"));
-
+	OverlappedWeapon->ScabbardMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("OneHandedScabbard"));
+	
 	EquippedWeapon = OverlappedWeapon;
 	GetInventory()->SetCarriedWeapon(EquippedWeapon);
 	SetCharacterWieldState(EquippedWeapon);
@@ -163,8 +164,14 @@ void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
 		return;
 	}
 	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("Dropping Weapon"));
-	
+
+	//Detach Scabbard from body
 	const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
+	WeaponToDrop->ScabbardMesh->DetachFromComponent((DetachmentRules));
+	//Attach Scabbard back to weapon
+	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+	WeaponToDrop->ScabbardMesh->AttachToComponent(WeaponToDrop->StaticMesh, AttachmentRules);
+	//Drop Weapon, reset it as a pickup
 	WeaponToDrop->StaticMesh->DetachFromComponent(DetachmentRules);
 	WeaponToDrop->SetItemState(EItemState::Pickup);
 	const EWeaponType DroppedWeaponType = WeaponToDrop->WeaponType;
