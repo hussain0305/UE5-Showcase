@@ -76,8 +76,9 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(InputAction_Move, ETriggerEvent::Triggered, this, &AOmniCharacter::Move);
 		EnhancedInputComponent->BindAction(InputAction_Look, ETriggerEvent::Triggered, this, &AOmniCharacter::Look);
-		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::TryPickupWeapon);
-		EnhancedInputComponent->BindAction(InputAction_Sheath, ETriggerEvent::Triggered, this, &AOmniCharacter::TryPickupWeapon);
+		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::HandleWeapon);
+		EnhancedInputComponent->BindAction(InputAction_OneHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::OneHandedWeaponToggleSheath);
+		EnhancedInputComponent->BindAction(InputAction_TwoHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::TwoHandedWeaponToggleSheath);
 		EnhancedInputComponent->BindAction(InputAction_Attack_PrimaryAction, ETriggerEvent::Triggered, this, &AOmniCharacter::TryAttack_PrimaryAction);
 	}
 }
@@ -105,7 +106,7 @@ void AOmniCharacter::SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon)
 	}
 }
 
-void AOmniCharacter::SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon)
+void AOmniCharacter::SetOverlappingWeaponEnd(const AOmniWeapon* OverlappedWeapon)
 {
 	//Remove prompt to press Equip button
 
@@ -115,7 +116,7 @@ void AOmniCharacter::SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon)
 	}
 }
 
-void AOmniCharacter::TryPickupWeapon()
+void AOmniCharacter::HandleWeapon()
 {
 	//Is wielding a weapon which is NOT the same type as overlapping weapon - holster the current weapon, pickup overlapping
 	//Is wielding or has a weapon stowed away which is the same type as overlapping weapon - drop current weapon, pickup new
@@ -123,13 +124,17 @@ void AOmniCharacter::TryPickupWeapon()
 	
 	if (GetCharacterIsOverlappingWeapon())
 	{
-		if (GetInventory()->GetHasWeaponOfType(OverlappingWeapon))
+		if (GetInventory()->GetHasWeaponOfTypeInInventory(OverlappingWeapon->WeaponType))
 		{
-			TObjectPtr<AOmniWeapon> WeaponToDrop = GetInventory()->GetCurrentlyCarriedWeaponOfType(OverlappingWeapon);
+			const TObjectPtr<AOmniWeapon> WeaponToDrop = GetInventory()->GetWeaponOfTypeInInventory(OverlappingWeapon->WeaponType);
 			if(WeaponToDrop != nullptr)
 			{
 				DropWeapon(WeaponToDrop);
 			}
+		}
+		else if(GetInventory()->GetIsWieldingWeaponOfDifferentType(OverlappingWeapon->WeaponType))
+		{
+			SheathWeapon();
 		}
 		EquipWeapon(WeaponToPickup);
 		
@@ -139,22 +144,55 @@ void AOmniCharacter::TryPickupWeapon()
 	}
 }
 
-void AOmniCharacter::EquipWeapon(AOmniWeapon* OverlappedWeapon)
+void AOmniCharacter::EquipWeapon(AOmniWeapon* WeaponToEquip)
 {
-	if (OverlappedWeapon == nullptr)
+	if (WeaponToEquip == nullptr)
 	{
 		return;
 	}
 	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("Equipping Weapon"));
 
-	OverlappedWeapon->SetItemState(EItemState::Equipped);
+	WeaponToEquip->SetItemState(EItemState::Equipped);
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	OverlappedWeapon->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("RightHandSocket"));
-	OverlappedWeapon->ScabbardMesh->AttachToComponent(GetMesh(), AttachmentRules, FName("OneHandedScabbard"));
+	WeaponToEquip->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, GetWeaponWieldingSocket(WeaponToEquip->WeaponType));
+	WeaponToEquip->ScabbardMesh->AttachToComponent(GetMesh(), AttachmentRules, GetWeaponScabbardSocket(WeaponToEquip->WeaponType));
 	
-	EquippedWeapon = OverlappedWeapon;
-	GetInventory()->SetCarriedWeapon(EquippedWeapon);
-	SetCharacterWieldState(EquippedWeapon);
+	GetInventory()->SetWeaponInInventory(WeaponToEquip);
+	GetInventory()->SetWieldedWeapon(WeaponToEquip);
+	SetCharacterWieldState(WeaponToEquip);
+	SetCharacterActionState(ECharacterActionState::Idle);
+}
+
+void AOmniCharacter::EquipWeaponOfTypeFromInventory(EWeaponType WeaponType)
+{
+	AOmniWeapon* WeaponToEquip = GetInventory()->GetWeaponOfTypeInInventory(WeaponType);
+	if (WeaponToEquip != nullptr)
+	{
+		EquipWeapon(WeaponToEquip);
+	}
+}
+
+void AOmniCharacter::SheathWeapon()
+{
+	AOmniWeapon* WeaponToSheath = GetInventory()->GetWieldedWeapon();
+	if (WeaponToSheath == nullptr)
+	{
+		return;
+	}
+
+	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+	//Detach Scabbard from body
+	const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
+	WeaponToSheath->ScabbardMesh->DetachFromComponent((DetachmentRules));
+	//Attach Scabbard back to weapon
+	WeaponToSheath->ScabbardMesh->AttachToComponent(WeaponToSheath->StaticMesh, AttachmentRules);
+	//Attach to character body
+	WeaponToSheath->AttachToComponent(GetMesh(), AttachmentRules, GetWeaponScabbardSocket(WeaponToSheath->WeaponType));
+
+	GetInventory()->SetWieldedWeapon(nullptr);
+	SetCharacterWieldState(nullptr);
+
+	SetCharacterActionState(ECharacterActionState::Idle);
 }
 
 void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
@@ -176,14 +214,51 @@ void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
 	WeaponToDrop->SetItemState(EItemState::Pickup);
 	const EWeaponType DroppedWeaponType = WeaponToDrop->WeaponType;
 
-	EquippedWeapon = nullptr;
-	GetInventory()->SetCarriedWeapon(DroppedWeaponType, nullptr);
+	GetInventory()->SetWeaponInInventory(DroppedWeaponType, nullptr);
+	GetInventory()->SetWieldedWeapon(nullptr);
 	SetCharacterWieldState(nullptr);
 }
 
-void AOmniCharacter::TrySheathOrUnsheath()
+void AOmniCharacter::OneHandedWeaponToggleSheath()
 {
+	if(!GetInventory()->GetHasWeaponOfTypeInInventory(EWeaponType::OneHandedWeapon))
+	{
+		PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("No weapon found in inventory"));
+		return;
+	}
+
+	ToggleSheath(EWeaponType::OneHandedWeapon);
+}
+
+void AOmniCharacter::TwoHandedWeaponToggleSheath()
+{
+	if(!GetInventory()->GetHasWeaponOfTypeInInventory(EWeaponType::TwoHandedWeapon))
+	{
+		return;
+	}
 	
+	ToggleSheath(EWeaponType::TwoHandedWeapon);
+}
+
+void AOmniCharacter::ToggleSheath(EWeaponType WeaponType)
+{
+	PRINT_DEBUG_MESSAGE(5.f, FColor::Green, FString("Toggle Sheath called"));
+	if (GetCharacterIsWieldingWeapon())
+	{
+		if (GetInventory()->GetIsWieldingWeaponOfDifferentType(WeaponType))
+		{
+			SheathWeapon();
+			PlayWeaponUnsheathAnimation(GetInventory()->GetWeaponOfTypeInInventory(WeaponType));
+		}
+		else
+		{
+			PlayWeaponSheathAnimation(GetInventory()->GetWieldedWeapon());
+		}
+	}
+	else
+	{
+		PlayWeaponUnsheathAnimation(GetInventory()->GetWeaponOfTypeInInventory(WeaponType));
+	}
 }
 
 void AOmniCharacter::SetCharacterWieldState(const TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon)
@@ -204,13 +279,68 @@ void AOmniCharacter::SetCharacterWieldState(const TObjectPtr<AOmniWeapon> Curren
 	}
 }
 
+//TODO: Make this Function better. Unsheathing should not require a reference to the weapon, just unsheath the currently equipped one
+void AOmniCharacter::PlayWeaponSheathAnimation(AOmniWeapon* WeaponToSheath)
+{
+	if (WeaponToSheath == nullptr)
+	{
+		return;
+	}
+	if (!GetCanSheathWeapon())
+	{
+		return;
+	}
+	if (!GetInventory() || !GetInventory()->GetWieldedWeapon())
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimMontage* SheathMontage = GetInventory()->GetWieldedWeapon()->SheathMontage;
+	if (AnimInstance && SheathMontage)
+	{
+		AnimInstance->Montage_Play(SheathMontage);
+		SetCharacterActionState(ECharacterActionState::OtherAction);
+	}
+}
+
+
+void AOmniCharacter::PlayWeaponUnsheathAnimation(AOmniWeapon* WeaponToUnsheath)
+{
+	if (WeaponToUnsheath == nullptr)
+	{
+		return;
+	}
+	if (!GetCanUnsheathWeapon())
+	{
+		return;
+	}
+	if (!GetInventory() || GetInventory()->GetWieldedWeapon())
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimMontage* UnsheathMontage = WeaponToUnsheath->UnsheathMontage;
+	if (AnimInstance && UnsheathMontage)
+	{
+		AnimInstance->Montage_Play(UnsheathMontage);
+		SetCharacterActionState(ECharacterActionState::OtherAction);
+	}
+}
+
 void AOmniCharacter::TryAttack_PrimaryAction()
 {
 	if (!GetCanAttackPrimaryAction())
 	{
 		return;
 	}
+	if (!GetInventory() || !GetInventory()->GetWieldedWeapon())
+	{
+		return;
+	}
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimMontage* AttackMontage = GetInventory()->GetWieldedWeapon()->AttackMontage;
 	if (AnimInstance && AttackMontage)
 	{
 		const int32 SectionToPlay = FMath::RandRange(1,4);

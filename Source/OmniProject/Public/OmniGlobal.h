@@ -36,12 +36,14 @@ enum class ECharacterActionState : uint8
 {
 	Idle						UMETA(DisplayName = "Idle"),
 	Attacking_PrimaryAction		UMETA(DisplayName = "Attacking - Primary Action"),
-	Attacking_SecondaryAction	UMETA(DisplayName = "Attacking - Secondary Action")
+	Attacking_SecondaryAction	UMETA(DisplayName = "Attacking - Secondary Action"),
+	OtherAction					UMETA(DisplayName = "OtherAction")
 };
 
 UENUM(BlueprintType)
 enum class EItemState : uint8
 {
 	Pickup				UMETA(DisplayName = "Pickup"),
-	Equipped			UMETA(DisplayName = "Equipped")
+	Equipped			UMETA(DisplayName = "Equipped"),
+	Sheathed			UMETA(DisplayName = "Sheathed")
 };

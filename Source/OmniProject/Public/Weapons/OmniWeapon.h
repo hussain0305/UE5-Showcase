@@ -21,7 +21,23 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
 		EWeaponType WeaponType;
+
+//=====================================
+//Public Pointers, Variables and Fields
+//=====================================
 	
+	//-------------------
+	// Animation Montages
+	//-------------------
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		UAnimMontage* SheathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		UAnimMontage* UnsheathMontage;
+
 protected:
 
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;

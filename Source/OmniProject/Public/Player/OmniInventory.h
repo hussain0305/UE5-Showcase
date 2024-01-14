@@ -24,20 +24,25 @@ public:
 	//---------------------------------------------------------------------
 	// Inventory Helpers - Weapons currently being carried by the character
 	//---------------------------------------------------------------------
-	FORCEINLINE bool GetIsCarryingOneHandedWeapon() const {return OneHandedWeapon != nullptr;}
-	FORCEINLINE bool GetIsCarryingTwoHandedWeapon() const {return TwoHandedWeapon != nullptr;}
-	FORCEINLINE void SetCarriedOneHandedWeapon(const TObjectPtr<AOmniWeapon> CarriedWeapon) {OneHandedWeapon = CarriedWeapon;}
-	FORCEINLINE void SetCarriedTwoHandedWeapon(const TObjectPtr<AOmniWeapon> CarriedWeapon) {TwoHandedWeapon = CarriedWeapon;}
-	FORCEINLINE bool GetHasWeaponOfType(const TObjectPtr<AOmniWeapon> WeaponToPickup) const {return GetCurrentlyCarriedWeaponOfType(WeaponToPickup) != nullptr;}
-	FORCEINLINE TObjectPtr<AOmniWeapon> GetCurrentlyCarriedWeaponOfType(const TObjectPtr<AOmniWeapon> Weapon) const {return (Weapon->WeaponType == EWeaponType::OneHandedWeapon ? OneHandedWeapon : TwoHandedWeapon);}
+	FORCEINLINE bool GetHasOneHandedWeaponInInventory() const {return OneHandedWeapon != nullptr;}
+	FORCEINLINE bool GetHasTwoHandedWeaponInInventory() const {return TwoHandedWeapon != nullptr;}
+	FORCEINLINE void SetOneHandedWeaponInInventory(const TObjectPtr<AOmniWeapon> CarriedWeapon) {OneHandedWeapon = CarriedWeapon;}
+	FORCEINLINE void SetTwoHandedWeaponInInventory(const TObjectPtr<AOmniWeapon> CarriedWeapon) {TwoHandedWeapon = CarriedWeapon;}
+	FORCEINLINE void SetWieldedWeapon(const TObjectPtr<AOmniWeapon> WieldedWeapon) {CurrentlyWieldedWeapon = WieldedWeapon;}
+	FORCEINLINE bool GetHasWeaponOfTypeInInventory(const EWeaponType WeaponType) const {return GetWeaponOfTypeInInventory(WeaponType) != nullptr;}
+	FORCEINLINE bool GetIsWieldingWeaponOfDifferentType(const EWeaponType WeaponType) const {return CurrentlyWieldedWeapon != nullptr && CurrentlyWieldedWeapon->WeaponType != WeaponType;}
+	FORCEINLINE TObjectPtr<AOmniWeapon> GetWeaponOfTypeInInventory(const EWeaponType WeaponType) const {return (WeaponType == EWeaponType::OneHandedWeapon ? OneHandedWeapon : TwoHandedWeapon);}
+	FORCEINLINE TObjectPtr<AOmniWeapon> GetWieldedWeapon() const {return CurrentlyWieldedWeapon;}
 
-	void SetCarriedWeapon(TObjectPtr<AOmniWeapon> Weapon);
-	void SetCarriedWeapon(EWeaponType WeaponType, TObjectPtr<AOmniWeapon> Weapon);
+	void SetWeaponInInventory(TObjectPtr<AOmniWeapon> Weapon);
+	void SetWeaponInInventory(EWeaponType WeaponType, TObjectPtr<AOmniWeapon> Weapon);
 private:
 	
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<AOmniWeapon> OneHandedWeapon;
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<AOmniWeapon> TwoHandedWeapon;
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon;
 
 };

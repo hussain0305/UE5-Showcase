@@ -35,6 +35,14 @@ public:
 	AOmniCharacter();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+//======
+//Consts
+//======
+	const FName ONE_HANDED_WEAPON_SOCKET = "RightHandSocket";
+	const FName TWO_HANDED_WEAPON_SOCKET = "RightHandSocket";
+	const FName ONE_HANDED_SCABBARD_SOCKET = "OneHandedScabbard";
+	const FName TWO_HANDED_SCABBARD_SOCKET = "TwoHandedScabbard";
+	
 //=====================================
 //Public Pointers, Variables and Fields
 //=====================================
@@ -61,7 +69,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputAction* InputAction_Equip;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_Sheath;
+		UInputAction* InputAction_OneHandedToggleSheath;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+		UInputAction* InputAction_TwoHandedToggleSheath;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputAction* InputAction_Attack_PrimaryAction;
 
@@ -72,13 +82,7 @@ public:
 		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
 		TObjectPtr<UAttributeSet> AttributeSet;
-
-	//-------------------
-	// Animation Montages
-	//-------------------
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-		UAnimMontage* AttackMontage;
-
+	
 //==================================
 //Setters, Getters, Inline Functions
 //==================================
@@ -88,6 +92,8 @@ public:
 	//--------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintPure)
 		bool BP_GetCharacterIsWieldingWeapon() const { return GetCharacterIsWieldingWeapon();}
+	UFUNCTION(BlueprintPure)
+		AOmniWeapon* BP_GetWieldedWeapon() const { return GetInventory()->GetWieldedWeapon();}
 
 	void SetCharacterWieldState(const TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon);
 	FORCEINLINE ECharacterWieldState GetCharacterWieldState() const { return CharacterWieldState;}
@@ -104,18 +110,26 @@ public:
 	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
 	FORCEINLINE bool GetCanAttackPrimaryAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetCanSheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetCanUnsheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle;}
 	
 	//-------
 	// Others
 	//-------
 	FORCEINLINE bool GetCharacterIsOverlappingWeapon() const { return OverlappingWeapon != nullptr;}
-
+	FORCEINLINE FName GetWeaponWieldingSocket(EWeaponType WeaponType) const { return WeaponType == EWeaponType::OneHandedWeapon ? ONE_HANDED_WEAPON_SOCKET : TWO_HANDED_WEAPON_SOCKET;}
+	FORCEINLINE FName GetWeaponScabbardSocket(EWeaponType WeaponType) const { return WeaponType == EWeaponType::OneHandedWeapon ? ONE_HANDED_SCABBARD_SOCKET : TWO_HANDED_SCABBARD_SOCKET;}
+	
 //=========
 //Functions
 //=========
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	//--------------------------------
+	// Overlapping Weapons and Pickups
+	//--------------------------------
 	UFUNCTION()
 		void SetOverlappingItemBegin(AOmniItem* OverlappedItem);
 	UFUNCTION()
@@ -123,10 +137,26 @@ public:
 	UFUNCTION()
 		void SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon);
 	UFUNCTION()
-		void SetOverlappingWeaponEnd(AOmniWeapon* OverlappedWeapon);
+		void SetOverlappingWeaponEnd(const AOmniWeapon* OverlappedWeapon);
+
+	//---------------
+	// Weapon Actions
+	//---------------
 	UFUNCTION(BlueprintCallable)
 		void AttackEnded();
-		
+	UFUNCTION()
+		void PlayWeaponSheathAnimation(AOmniWeapon* WeaponToSheath);
+	UFUNCTION(BlueprintCallable)
+		void SheathWeapon();
+	UFUNCTION()
+		void PlayWeaponUnsheathAnimation(AOmniWeapon* WeaponToUnsheath);
+	UFUNCTION(BlueprintCallable)
+		void EquipWeapon(AOmniWeapon* WeaponToEquip);
+	UFUNCTION(BlueprintCallable)
+		void EquipWeaponOfTypeFromInventory(EWeaponType WeaponType);
+	UFUNCTION()
+		void DropWeapon(AOmniWeapon* WeaponToDrop);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -137,13 +167,13 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	UFUNCTION()
-		void TryPickupWeapon();
+		void HandleWeapon();
 	UFUNCTION()
-		void EquipWeapon(AOmniWeapon* OverlappedWeapon);
+		void OneHandedWeaponToggleSheath();
 	UFUNCTION()
-		void DropWeapon(AOmniWeapon* WeaponToDrop);
+		void TwoHandedWeaponToggleSheath();
 	UFUNCTION()
-		void TrySheathOrUnsheath();
+		void ToggleSheath(EWeaponType WeaponType);
 	UFUNCTION()
 		void TryAttack_PrimaryAction();
 
@@ -157,8 +187,6 @@ private:
 		AOmniItem* OverlappingItem = nullptr;
 	UPROPERTY(VisibleAnywhere)
 		AOmniWeapon* OverlappingWeapon = nullptr;
-	UPROPERTY(VisibleAnywhere)
-		AOmniWeapon* EquippedWeapon = nullptr;
 	UPROPERTY(VisibleAnywhere)
 		ECharacterWieldState CharacterWieldState = ECharacterWieldState::Unequipped;
 	UPROPERTY(VisibleAnywhere)

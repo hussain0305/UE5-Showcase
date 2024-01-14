@@ -3,15 +3,15 @@
 
 #include "Player/OmniInventory.h"
 
-void UOmniInventory::SetCarriedWeapon(TObjectPtr<AOmniWeapon> Weapon)
+void UOmniInventory::SetWeaponInInventory(TObjectPtr<AOmniWeapon> Weapon)
 {
 	if (Weapon != nullptr)
 	{
-		SetCarriedWeapon(Weapon->WeaponType, Weapon);
+		SetWeaponInInventory(Weapon->WeaponType, Weapon);
 	}
 }
 
-void UOmniInventory::SetCarriedWeapon(EWeaponType WeaponType, TObjectPtr<AOmniWeapon> Weapon)
+void UOmniInventory::SetWeaponInInventory(EWeaponType WeaponType, TObjectPtr<AOmniWeapon> Weapon)
 {
 	switch (WeaponType)
 	{
