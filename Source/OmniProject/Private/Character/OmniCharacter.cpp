@@ -14,12 +14,16 @@
 #include "Player/OmniController.h"
 #include "Animation/AnimMontage.h"
 #include "DebugMacros.h"
-#include "Components/SphereComponent.h"
+#include "OmniGlobal.h"
+#include "Components/CapsuleComponent.h"
 
 AOmniCharacter::AOmniCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	GetMesh()->SetCollisionProfileName(CHARACTER_COLLISION_PROFILE);
+	GetCapsuleComponent()->SetCollisionProfileName(CHARACTER_COLLISION_PROFILE);
+	
 	//Setup Camera Boom
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("Camera Boom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
@@ -150,13 +154,13 @@ void AOmniCharacter::EquipWeapon(AOmniWeapon* WeaponToEquip)
 	{
 		return;
 	}
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("Equipping Weapon"));
 
 	WeaponToEquip->SetItemState(EItemState::Equipped);
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	WeaponToEquip->StaticMesh->AttachToComponent(GetMesh(), AttachmentRules, GetWeaponWieldingSocket(WeaponToEquip->WeaponType));
 	WeaponToEquip->ScabbardMesh->AttachToComponent(GetMesh(), AttachmentRules, GetWeaponScabbardSocket(WeaponToEquip->WeaponType));
-	
+	WeaponToEquip->SetWielder(this);
+
 	GetInventory()->SetWeaponInInventory(WeaponToEquip);
 	GetInventory()->SetWieldedWeapon(WeaponToEquip);
 	SetCharacterWieldState(WeaponToEquip);
@@ -188,7 +192,8 @@ void AOmniCharacter::SheathWeapon()
 	WeaponToSheath->ScabbardMesh->AttachToComponent(WeaponToSheath->StaticMesh, AttachmentRules);
 	//Attach to character body
 	WeaponToSheath->AttachToComponent(GetMesh(), AttachmentRules, GetWeaponScabbardSocket(WeaponToSheath->WeaponType));
-
+	WeaponToSheath->SetItemState(EItemState::Sheathed);
+	
 	GetInventory()->SetWieldedWeapon(nullptr);
 	SetCharacterWieldState(nullptr);
 
@@ -201,7 +206,6 @@ void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
 	{
 		return;
 	}
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("Dropping Weapon"));
 
 	//Detach Scabbard from body
 	const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
@@ -212,6 +216,7 @@ void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
 	//Drop Weapon, reset it as a pickup
 	WeaponToDrop->StaticMesh->DetachFromComponent(DetachmentRules);
 	WeaponToDrop->SetItemState(EItemState::Pickup);
+	WeaponToDrop->SetWielder(nullptr);
 	const EWeaponType DroppedWeaponType = WeaponToDrop->WeaponType;
 
 	GetInventory()->SetWeaponInInventory(DroppedWeaponType, nullptr);
@@ -242,7 +247,6 @@ void AOmniCharacter::TwoHandedWeaponToggleSheath()
 
 void AOmniCharacter::ToggleSheath(EWeaponType WeaponType)
 {
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Green, FString("Toggle Sheath called"));
 	if (GetCharacterIsWieldingWeapon())
 	{
 		if (GetInventory()->GetIsWieldingWeaponOfDifferentType(WeaponType))

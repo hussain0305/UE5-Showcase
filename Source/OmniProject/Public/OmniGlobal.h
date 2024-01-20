@@ -6,6 +6,10 @@
 
 class AOmniWeapon;
 
+static FName WEAPON_COLLISION_PROFILE = "OmniWeaponCollision";
+static FName WEAPON_PICKUP_PROFILE = "OmniPickups";
+static FName CHARACTER_COLLISION_PROFILE = "OmniCharacterCollision";
+
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {

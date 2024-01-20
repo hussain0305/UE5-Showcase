@@ -1,6 +1,8 @@
 #include "Items/OmniItem.h"
+#include "DebugMacros.h"
 #include "Character/OmniCharacter.h"
 #include "Components/SphereComponent.h"
+#include "OmniGlobal.h"
 
 AOmniItem::AOmniItem()
 {
@@ -9,10 +11,12 @@ AOmniItem::AOmniItem()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Object Mesh"));
 	SetRootComponent(StaticMesh);
 	StaticMesh->SetGenerateOverlapEvents(false);
+	StaticMesh->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(FName("Collision Sphere"));
 	SphereComponent->SetupAttachment(GetRootComponent());
 	SphereComponent->SetGenerateOverlapEvents(true);
+	SphereComponent->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
 }
 
 void AOmniItem::ItemEquipped()
@@ -27,10 +31,19 @@ void AOmniItem::SetItemState(const EItemState NewState)
 	{
 	case EItemState::Equipped:
 		SphereComponent->Deactivate();
+		StaticMesh->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
+		SphereComponent->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
+		break;
+	case EItemState::Sheathed:
+		SphereComponent->Deactivate();
+		StaticMesh->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
+		SphereComponent->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
 		break;
 	case EItemState::Pickup:
 		SetActorRotation(FRotator(0.f,0.f,0.f));
 		SphereComponent->Activate();
+		StaticMesh->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
+		SphereComponent->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
 		break;
 	}
 }

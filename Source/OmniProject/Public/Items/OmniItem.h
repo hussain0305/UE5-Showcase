@@ -7,6 +7,7 @@
 
 class UStaticMeshComponent;
 class USphereComponent;
+class AOmniCharacter;
 
 UCLASS()
 class OMNIPROJECT_API AOmniItem : public AActor
@@ -42,7 +43,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		virtual void ItemEquipped();
 	UFUNCTION(BlueprintCallable)
-		void SetItemState(const EItemState NewState);
+		virtual void SetItemState(const EItemState NewState);
 
 //==================================
 //Setters, Getters, Inline Functions
@@ -52,7 +53,9 @@ public:
 		FORCEINLINE EItemState GetItemState() const { return ItemState; }
 	UFUNCTION(BlueprintCallable)
 		FORCEINLINE bool IsPickup() const { return ItemState == EItemState::Pickup; }
-
+	FORCEINLINE AOmniCharacter* GetWielder() const {return Wielder; }
+	FORCEINLINE void SetWielder(AOmniCharacter* NewWielder) {Wielder = NewWielder; }
+	
 protected:
 
 	virtual void BeginPlay() override;	
@@ -70,6 +73,19 @@ protected:
 
 private:
 
+	
+
+//=====================================
+//Public Pointers, Variables and Fields
+//=====================================
+
 	EItemState ItemState = EItemState::Pickup;
+
+	UPROPERTY(VisibleAnywhere)
+		AOmniCharacter* Wielder;
+
+	//--------------
+	// Functionality
+	//--------------
 	float GameTime;
 };

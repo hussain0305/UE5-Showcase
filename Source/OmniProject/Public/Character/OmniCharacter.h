@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "OmniGlobal.h"
+#include "Interfaces/Damageable.h"
 #include "Player/OmniInventory.h"
 #include "Weapons/OmniWeapon.h"
 #include "OmniCharacter.generated.h"
@@ -23,7 +24,7 @@ class AOmniItem;
 class AOmniWeapon;
 
 UCLASS()
-class OMNIPROJECT_API AOmniCharacter : public ACharacter, public IAbilitySystemInterface
+class OMNIPROJECT_API AOmniCharacter : public ACharacter, public IAbilitySystemInterface//, public IDamageable
 {
 	GENERATED_BODY()
 

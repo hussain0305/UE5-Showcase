@@ -22,3 +22,8 @@
 	{ \
 		GEngine->AddOnScreenDebugMessage(-1, Duration, Color, Message); \
 	}
+#define PRINT_DEBUG_MESSAGE_WITH_PARAMETER(Duration, Color, Message, StringParameter) if (GEngine) \
+	{ \
+		FString Msg = Message + StringParameter; \
+		GEngine->AddOnScreenDebugMessage(-1, Duration, Color, Msg); \
+	}
