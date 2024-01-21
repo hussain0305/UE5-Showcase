@@ -31,6 +31,7 @@ public:
 	FORCEINLINE void SetWieldedWeapon(const TObjectPtr<AOmniWeapon> WieldedWeapon) {CurrentlyWieldedWeapon = WieldedWeapon;}
 	FORCEINLINE bool GetHasWeaponOfTypeInInventory(const EWeaponType WeaponType) const {return GetWeaponOfTypeInInventory(WeaponType) != nullptr;}
 	FORCEINLINE bool GetIsWieldingWeaponOfDifferentType(const EWeaponType WeaponType) const {return CurrentlyWieldedWeapon != nullptr && CurrentlyWieldedWeapon->WeaponType != WeaponType;}
+	FORCEINLINE bool GetWieldedWeaponDropped(const TObjectPtr<AOmniWeapon> DroppedWeapon) const {return CurrentlyWieldedWeapon != nullptr && CurrentlyWieldedWeapon == DroppedWeapon;}
 	FORCEINLINE TObjectPtr<AOmniWeapon> GetWeaponOfTypeInInventory(const EWeaponType WeaponType) const {return (WeaponType == EWeaponType::OneHandedWeapon ? OneHandedWeapon : TwoHandedWeapon);}
 	FORCEINLINE TObjectPtr<AOmniWeapon> GetWieldedWeapon() const {return CurrentlyWieldedWeapon;}
 

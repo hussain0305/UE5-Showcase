@@ -133,11 +133,13 @@ void AOmniCharacter::HandleWeapon()
 			const TObjectPtr<AOmniWeapon> WeaponToDrop = GetInventory()->GetWeaponOfTypeInInventory(OverlappingWeapon->WeaponType);
 			if(WeaponToDrop != nullptr)
 			{
+				PRINT_DEBUG_MESSAGE_WITH_PARAMETER(5.f, FColor::Emerald, FString("Droping "), WeaponToDrop->GetName());
 				DropWeapon(WeaponToDrop);
 			}
 		}
-		else if(GetInventory()->GetIsWieldingWeaponOfDifferentType(OverlappingWeapon->WeaponType))
+		if(GetInventory()->GetIsWieldingWeaponOfDifferentType(OverlappingWeapon->WeaponType))
 		{
+			PRINT_DEBUG_MESSAGE_WITH_PARAMETER(5.f, FColor::Emerald, FString("Sheathing "), GetInventory()->GetWieldedWeapon()->GetName());
 			SheathWeapon();
 		}
 		EquipWeapon(WeaponToPickup);
@@ -154,6 +156,7 @@ void AOmniCharacter::EquipWeapon(AOmniWeapon* WeaponToEquip)
 	{
 		return;
 	}
+	PRINT_DEBUG_MESSAGE_WITH_PARAMETER(5.f, FColor::Emerald, FString("Equipping "), WeaponToEquip->GetName());
 
 	WeaponToEquip->SetItemState(EItemState::Equipped);
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
@@ -220,7 +223,10 @@ void AOmniCharacter::DropWeapon(AOmniWeapon* WeaponToDrop)
 	const EWeaponType DroppedWeaponType = WeaponToDrop->WeaponType;
 
 	GetInventory()->SetWeaponInInventory(DroppedWeaponType, nullptr);
-	GetInventory()->SetWieldedWeapon(nullptr);
+	if (GetInventory()->GetWieldedWeaponDropped(WeaponToDrop))
+	{
+		GetInventory()->SetWieldedWeapon(nullptr);
+	}
 	SetCharacterWieldState(nullptr);
 }
 
