@@ -353,7 +353,7 @@ void AOmniCharacter::TryAttack_PrimaryAction()
 	UAnimMontage* AttackMontage = GetInventory()->GetWieldedWeapon()->AttackMontage;
 	if (AnimInstance && AttackMontage)
 	{
-		const int32 SectionToPlay = FMath::RandRange(1,4);
+		const int32 SectionToPlay = FMath::RandRange(1,GetInventory()->GetWieldedWeapon()->NumAttackOptions);
 		std::string SectionName = "Attack";
 		SectionName += std::to_string(SectionToPlay);
 		AnimInstance->Montage_Play(AttackMontage);

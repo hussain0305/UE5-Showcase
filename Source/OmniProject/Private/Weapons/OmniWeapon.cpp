@@ -93,7 +93,7 @@ void AOmniWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		ActorsToIgnore.Add(GetWielder());
 	}
-	
+
 	UKismetSystemLibrary::BoxTraceSingle(
 		this,
 		WeaponTraceStart->GetComponentLocation(),

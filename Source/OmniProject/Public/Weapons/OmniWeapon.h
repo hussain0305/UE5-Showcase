@@ -27,20 +27,30 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
 		EWeaponType WeaponType;
 
-	UPROPERTY(EditDefaultsOnly)
+	//-----------------
+	// Weapon Hit Trace
+	//-----------------
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Trace")
 		UBoxComponent* WeaponBox;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Trace")
 		USceneComponent* WeaponTraceTransforms;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Trace")
 		USceneComponent* WeaponTraceStart;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Trace")
 		USceneComponent* WeaponTraceEnd;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Trace")
 		FVector WeaponHitTraceSize = FVector(2.f,2.f,2.f);
+
+	//-----------------
+	// Weapon Hit Trace
+	//-----------------
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+		int NumAttackOptions = 1;
+
 	//-------------------
 	// Animation Montages
 	//-------------------
