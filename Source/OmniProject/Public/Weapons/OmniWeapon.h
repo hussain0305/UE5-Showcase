@@ -38,7 +38,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		USceneComponent* WeaponTraceEnd;
-	
+
+	UPROPERTY(EditDefaultsOnly)
+		FVector WeaponHitTraceSize = FVector(2.f,2.f,2.f);
 	//-------------------
 	// Animation Montages
 	//-------------------

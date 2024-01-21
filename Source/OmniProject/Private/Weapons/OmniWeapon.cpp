@@ -98,7 +98,7 @@ void AOmniWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		this,
 		WeaponTraceStart->GetComponentLocation(),
 		WeaponTraceEnd->GetComponentLocation(),
-		FVector(2.f,2.f,2.f),
+		WeaponHitTraceSize,
 		WeaponTraceStart->GetComponentRotation(),
 		ETraceTypeQuery::TraceTypeQuery1,
 		false,
