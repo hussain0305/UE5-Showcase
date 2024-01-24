@@ -84,6 +84,8 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_OneHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::OneHandedWeaponToggleSheath);
 		EnhancedInputComponent->BindAction(InputAction_TwoHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::TwoHandedWeaponToggleSheath);
 		EnhancedInputComponent->BindAction(InputAction_Attack_PrimaryAction, ETriggerEvent::Triggered, this, &AOmniCharacter::TryAttack_PrimaryAction);
+		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Started, this, &AOmniCharacter::TrySecondaryAction);
+		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Completed, this, &AOmniCharacter::EndSecondaryAction);
 	}
 }
 
@@ -361,6 +363,16 @@ void AOmniCharacter::TryAttack_PrimaryAction()
 		PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString(SectionName.c_str()));
 		SetCharacterActionState(ECharacterActionState::Attacking_PrimaryAction);
 	}
+}
+
+void AOmniCharacter::TrySecondaryAction()
+{
+	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Pressed"));
+}
+
+void AOmniCharacter::EndSecondaryAction()
+{
+	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Released"));
 }
 
 void AOmniCharacter::AttackEnded()

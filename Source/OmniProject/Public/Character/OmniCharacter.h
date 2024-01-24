@@ -75,6 +75,8 @@ public:
 		UInputAction* InputAction_TwoHandedToggleSheath;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 		UInputAction* InputAction_Attack_PrimaryAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+		UInputAction* InputAction_Attack_SecondaryAction;
 
 	//----------------
 	// Ability System
@@ -177,6 +179,10 @@ protected:
 		void ToggleSheath(EWeaponType WeaponType);
 	UFUNCTION()
 		void TryAttack_PrimaryAction();
+	UFUNCTION()
+		void TrySecondaryAction();
+	UFUNCTION()
+		void EndSecondaryAction();
 
 private:
 
