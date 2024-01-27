@@ -83,9 +83,9 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_Equip, ETriggerEvent::Triggered, this, &AOmniCharacter::HandleWeapon);
 		EnhancedInputComponent->BindAction(InputAction_OneHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::OneHandedWeaponToggleSheath);
 		EnhancedInputComponent->BindAction(InputAction_TwoHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::TwoHandedWeaponToggleSheath);
-		EnhancedInputComponent->BindAction(InputAction_Attack_PrimaryAction, ETriggerEvent::Triggered, this, &AOmniCharacter::TryAttack_PrimaryAction);
-		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Started, this, &AOmniCharacter::TrySecondaryAction);
-		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Completed, this, &AOmniCharacter::EndSecondaryAction);
+		EnhancedInputComponent->BindAction(InputAction_Attack_PrimaryAction, ETriggerEvent::Triggered, this, &AOmniCharacter::PrimaryAttackInput);
+		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Started, this, &AOmniCharacter::AimInput);
+		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Completed, this, &AOmniCharacter::StopAimInput);
 	}
 }
 
@@ -316,7 +316,6 @@ void AOmniCharacter::PlayWeaponSheathAnimation(AOmniWeapon* WeaponToSheath)
 	}
 }
 
-
 void AOmniCharacter::PlayWeaponUnsheathAnimation(AOmniWeapon* WeaponToUnsheath)
 {
 	if (WeaponToUnsheath == nullptr)
@@ -341,16 +340,45 @@ void AOmniCharacter::PlayWeaponUnsheathAnimation(AOmniWeapon* WeaponToUnsheath)
 	}
 }
 
-void AOmniCharacter::TryAttack_PrimaryAction()
+void AOmniCharacter::PrimaryAttackInput()
 {
-	if (!GetCanAttackPrimaryAction())
+	if (!GetCharacterIsWieldingWeapon())
 	{
 		return;
 	}
-	if (!GetInventory() || !GetInventory()->GetWieldedWeapon())
+	if (GetCanPerformPrimaryWeaponAction())
+	{
+		PrimaryAttackAction();
+	}
+	else if(GetCanPerformSecondaryWeaponAction())
+	{
+		SecondaryAttackAction();
+	}
+}
+
+void AOmniCharacter::AimInput()
+{
+	if (!GetCharacterIsWieldingWeapon())
 	{
 		return;
 	}
+	if (GetCanAim())
+	{
+		StartAim();
+	}
+}
+
+void AOmniCharacter::StopAimInput()
+{
+	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Released"));
+	if(GetIsAiming())
+	{
+		StopAim();
+	}
+}
+
+void AOmniCharacter::PrimaryAttackAction()
+{
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	UAnimMontage* AttackMontage = GetInventory()->GetWieldedWeapon()->AttackMontage;
 	if (AnimInstance && AttackMontage)
@@ -365,14 +393,46 @@ void AOmniCharacter::TryAttack_PrimaryAction()
 	}
 }
 
-void AOmniCharacter::TrySecondaryAction()
+void AOmniCharacter::StartAim()
 {
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Pressed"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
+	if (AnimInstance && SecondaryActionMontage)
+	{
+		AnimInstance->Montage_Play(SecondaryActionMontage);
+		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Aim, SecondaryActionMontage);
+		SetCharacterActionState(ECharacterActionState::Aiming_SecondaryAction);
+	}
 }
 
-void AOmniCharacter::EndSecondaryAction()
+void AOmniCharacter::StopAim()
 {
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Released"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
+	if (AnimInstance && SecondaryActionMontage)
+	{
+		AnimInstance->Montage_Play(SecondaryActionMontage);
+		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Aim, SecondaryActionMontage);
+		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, -1);
+		SetCharacterActionState(ECharacterActionState::Idle);
+	}
+}
+
+void AOmniCharacter::SecondaryAttackAction()
+{
+	if (!GetIsAiming())
+	{
+		return;
+	}
+	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("AXE THROW!!!!"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
+	if (AnimInstance && SecondaryActionMontage)
+	{
+		AnimInstance->Montage_Play(SecondaryActionMontage);
+		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Attack, SecondaryActionMontage);
+		SetCharacterActionState(ECharacterActionState::Attacking_SecondaryAction);
+	}
 }
 
 void AOmniCharacter::AttackEnded()

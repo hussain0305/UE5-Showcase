@@ -40,6 +40,7 @@ enum class ECharacterActionState : uint8
 {
 	Idle						UMETA(DisplayName = "Idle"),
 	Attacking_PrimaryAction		UMETA(DisplayName = "Attacking - Primary Action"),
+	Aiming_SecondaryAction		UMETA(DisplayName = "Aiming - Secondary Action"),
 	Attacking_SecondaryAction	UMETA(DisplayName = "Attacking - Secondary Action"),
 	OtherAction					UMETA(DisplayName = "OtherAction")
 };

@@ -112,7 +112,10 @@ public:
 	//---------------
 	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
-	FORCEINLINE bool GetCanAttackPrimaryAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetCanPerformPrimaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetCanAim() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction;}
+	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanSheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanUnsheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle;}
 	
@@ -178,11 +181,19 @@ protected:
 	UFUNCTION()
 		void ToggleSheath(EWeaponType WeaponType);
 	UFUNCTION()
-		void TryAttack_PrimaryAction();
+		void PrimaryAttackInput();
 	UFUNCTION()
-		void TrySecondaryAction();
+		void PrimaryAttackAction();
 	UFUNCTION()
-		void EndSecondaryAction();
+		void AimInput();
+	UFUNCTION()
+		void StopAimInput();
+	UFUNCTION()
+		void StartAim();
+	UFUNCTION()
+		void StopAim();
+	UFUNCTION()
+		void SecondaryAttackAction();
 
 private:
 

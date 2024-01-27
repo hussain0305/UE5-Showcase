@@ -55,15 +55,24 @@ public:
 	// Animation Montages
 	//-------------------
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
 		UAnimMontage* AttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Weapon Handling")
 		UAnimMontage* SheathMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Weapon Handling")
 		UAnimMontage* UnsheathMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
+		UAnimMontage* SecondaryActionMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
+		FName SecondaryActionMontage_Aim;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
+		FName SecondaryActionMontage_Attack;
+	
 //=========
 //Functions
 //=========
