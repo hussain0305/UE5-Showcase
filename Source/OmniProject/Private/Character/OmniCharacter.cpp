@@ -2,6 +2,8 @@
 
 
 #include "Character/OmniCharacter.h"
+
+#include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h" 
 #include "Components/StaticMeshComponent.h"
@@ -16,6 +18,7 @@
 #include "DebugMacros.h"
 #include "OmniGlobal.h"
 #include "Components/CapsuleComponent.h"
+#include "Player/OmniPlayerState.h"
 
 AOmniCharacter::AOmniCharacter()
 {
@@ -45,6 +48,31 @@ AOmniCharacter::AOmniCharacter()
 	Inventory = CreateDefaultSubobject<UOmniInventory>(FName("Inventory"));
 	
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+}
+
+void AOmniCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	//Init ability actor info for the server
+	InitAbilityActorInfo();
+}
+
+void AOmniCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	//Init ability actor info for the Client
+	InitAbilityActorInfo();
+}
+
+void AOmniCharacter::InitAbilityActorInfo()
+{
+	AOmniPlayerState* OmniPlayerState = GetPlayerState<AOmniPlayerState>();
+	check(OmniPlayerState);
+	OmniPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(OmniPlayerState, this);
+	AbilitySystemComponent = OmniPlayerState->GetAbilitySystemComponent();
+	AttributeSet = OmniPlayerState->GetAttributeSet();
 }
 
 UAbilitySystemComponent* AOmniCharacter::GetAbilitySystemComponent() const

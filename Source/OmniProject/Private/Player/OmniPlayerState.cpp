@@ -8,8 +8,11 @@
 
 AOmniPlayerState::AOmniPlayerState()
 {
+	NetUpdateFrequency = 60.0f;
+	
 	AbilitySystemComponent = CreateDefaultSubobject<UOmniAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	AttributeSet = CreateDefaultSubobject<UOmniAttributeSet>("AttributeSet");
 }

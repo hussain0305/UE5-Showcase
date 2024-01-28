@@ -34,7 +34,12 @@ public:
 //Constructor
 //===========
 	AOmniCharacter();
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+//=======================
+//Callbacks and Delegates
+//=======================
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
 
 //======
 //Consts
@@ -118,7 +123,12 @@ public:
 	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanSheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanUnsheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle;}
-	
+
+	//---------------
+	// Ability System
+	//---------------
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 	//-------
 	// Others
 	//-------
@@ -194,6 +204,11 @@ protected:
 		void StopAim();
 	UFUNCTION()
 		void SecondaryAttackAction();
+
+	//-------------
+	// Initializers
+	//-------------
+	void InitAbilityActorInfo();
 
 private:
 
