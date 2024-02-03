@@ -7,7 +7,7 @@
 
 UGameplayEffectHeal::UGameplayEffectHeal()
 {
-	FGameplayAttribute GameplayAttribute(UOmniAttributeSet::GetHealthAttribute());
-	FGameplayModifierInfo ModifierInfo(GameplayAttribute, EGameplayModOp::Additive, FGameplayEffectModifierMagnitude(HealPoints));
+	const FGameplayAttribute GameplayAttribute(UOmniAttributeSet::GetHealthAttribute());
+	const FGameplayModifierInfo ModifierInfo(GameplayAttribute, EGameplayModOp::Additive, FGameplayEffectModifierMagnitude(HealPoints));
 	Modifiers.Add(ModifierInfo);
 }
