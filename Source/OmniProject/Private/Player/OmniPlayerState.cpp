@@ -2,7 +2,6 @@
 
 
 #include "Player/OmniPlayerState.h"
-
 #include "GameplayAbilitySystem/OmniAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/OmniAttributeSet.h"
 
