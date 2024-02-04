@@ -6,9 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "OmniGameModeBase.generated.h"
 
-/**
- * 
- */
+
+
 UCLASS()
 class OMNIPROJECT_API AOmniGameModeBase : public AGameModeBase
 {
@@ -17,4 +16,11 @@ class OMNIPROJECT_API AOmniGameModeBase : public AGameModeBase
 public:
 
 	AOmniGameModeBase();
+
+	UPROPERTY(VisibleAnywhere)
+		UDataTable* GameplayEffectsDatabase;
+
+	UFUNCTION(BlueprintCallable)
+		bool GetGameplayEffectDetails(FName RowName, FOmniGameplayEffectsDatabase& DatabaseRow);
 };
+
