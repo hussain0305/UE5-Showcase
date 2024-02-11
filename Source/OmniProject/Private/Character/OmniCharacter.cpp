@@ -2,7 +2,6 @@
 
 
 #include "Character/OmniCharacter.h"
-
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h" 
