@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OmniGlobal.h"
+#include "HeaderFiles/OmniGlobal.h"
 #include "AnimNotifies/OmniAnimNotify.h"
 #include "OmniWeaponUnsheathNotify.generated.h"
 

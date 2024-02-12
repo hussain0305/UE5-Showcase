@@ -3,7 +3,7 @@
 
 #include "Game/OmniGameModeBase.h"
 
-#include "DebugMacros.h"
+#include "HeaderFiles/DebugMacros.h"
 #include "HeaderFiles/OmniGameplayEffectsTable.h"
 #include "Player/OmniController.h"
 #include "Player/OmniPlayerState.h"

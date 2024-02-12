@@ -4,7 +4,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "OmniGlobal.h"
+#include "HeaderFiles/OmniGlobal.h"
 #include "Interfaces/Damageable.h"
 #include "Player/OmniInventory.h"
 #include "Weapons/OmniWeapon.h"

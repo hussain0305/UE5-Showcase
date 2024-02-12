@@ -1,8 +1,8 @@
 #include "Items/OmniItem.h"
-#include "DebugMacros.h"
+#include "HeaderFiles/DebugMacros.h"
 #include "Character/OmniCharacter.h"
 #include "Components/SphereComponent.h"
-#include "OmniGlobal.h"
+#include "HeaderFiles/OmniGlobal.h"
 
 AOmniItem::AOmniItem()
 {

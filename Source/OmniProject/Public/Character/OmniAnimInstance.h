@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "OmniGlobal.h"
+#include "HeaderFiles/OmniGlobal.h"
 #include "OmniAnimInstance.generated.h"
 
 class AOmniCharacter;

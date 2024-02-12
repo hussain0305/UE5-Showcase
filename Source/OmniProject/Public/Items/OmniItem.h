@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "OmniGlobal.h"
+#include "HeaderFiles/OmniGlobal.h"
 #include "OmniItem.generated.h"
 
 class UStaticMeshComponent;

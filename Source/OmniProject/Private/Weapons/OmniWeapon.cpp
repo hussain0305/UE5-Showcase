@@ -1,9 +1,9 @@
 #include "Weapons/OmniWeapon.h"
-#include "DebugMacros.h"
+#include "HeaderFiles/DebugMacros.h"
 #include "Character/OmniCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "OmniGlobal.h"
+#include "HeaderFiles/OmniGlobal.h"
 
 AOmniWeapon::AOmniWeapon()
 {

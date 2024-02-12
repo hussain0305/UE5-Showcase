@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
-#include "OmniGlobal.h"
+#include "HeaderFiles/OmniGlobal.h"
 #include "Weapons/OmniWeapon.h"
 #include "OmniInventory.generated.h"
 
