@@ -136,9 +136,9 @@ public:
 	FORCEINLINE FName GetWeaponWieldingSocket(EWeaponType WeaponType) const { return WeaponType == EWeaponType::OneHandedWeapon ? ONE_HANDED_WEAPON_SOCKET : TWO_HANDED_WEAPON_SOCKET;}
 	FORCEINLINE FName GetWeaponScabbardSocket(EWeaponType WeaponType) const { return WeaponType == EWeaponType::OneHandedWeapon ? ONE_HANDED_SCABBARD_SOCKET : TWO_HANDED_SCABBARD_SOCKET;}
 	
-//=========
-//Functions
-//=========
+//================
+//Public Functions
+//================
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -226,4 +226,11 @@ private:
 		ECharacterActionState CharacterActionState = ECharacterActionState::Idle;
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<UOmniInventory> Inventory;
+
+//=================
+//Private Functions
+//=================
+	
+	void InitHUD() const;
+	
 };

@@ -13,5 +13,15 @@ UCLASS()
 class OMNIPROJECT_API UOmniUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	FORCEINLINE void SetWidgetController(const TObjectPtr<UOmniWidgetController> Controller) { WidgetController = Controller; }
+
+	UFUNCTION(BlueprintCallable)
+		UOmniWidgetController* GetWidgetController() { return WidgetController;}
+
+private:
 	
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<UOmniWidgetController> WidgetController;
 };

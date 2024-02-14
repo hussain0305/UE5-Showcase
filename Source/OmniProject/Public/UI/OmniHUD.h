@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "HeaderFiles/OmniPlayerDetails.h"
 #include "OmniHUD.generated.h"
 
+class UOmniWidgetController;
 class UOmniUserWidget;
 /**
  * 
@@ -17,15 +19,19 @@ class OMNIPROJECT_API AOmniHUD : public AHUD
 
 public:
 
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UOmniUserWidget> HUDOverlayWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Blueprints")
+		TSubclassOf<UOmniUserWidget> BP_HUDOverlay;
 
+	UPROPERTY(BlueprintReadOnly)
+		TObjectPtr<UOmniUserWidget> HUDOverlayWidget;
+
+	UPROPERTY(BlueprintReadOnly)
+		TObjectPtr<UOmniWidgetController> WidgetController;
+
+
+	UFUNCTION()
+		void InitializeHUD(FOmniWidgetControllerParams& PlayerDetails);
 protected:
 
 	virtual void BeginPlay() override;
-	
-private:
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UOmniUserWidget> HUDOverlayClass;
 };

@@ -16,16 +16,16 @@ AOmniGameModeBase::AOmniGameModeBase()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	FSoftObjectPath GameplayEffectsTablePath = FSoftObjectPath(TEXT("/Game/Data/GameplayEffectsInfo.GameplayEffectsInfo"));
-	if(Cast<UDataTable>(GameplayEffectsTablePath.ResolveObject()))
-	{
-		PRINT_DEBUG_MESSAGE(10, FColor::Emerald, FString("DATA TABLE FOUND"));
-		GameplayEffectsDatabase = Cast<UDataTable>(GameplayEffectsTablePath.ResolveObject());
-	}
-	else
-	{
-		PRINT_DEBUG_MESSAGE(10, FColor::Emerald, FString("NOT FOUND NOT FOUND"));
-	}
+	// FSoftObjectPath GameplayEffectsTablePath = FSoftObjectPath(TEXT("/Game/Data/GameplayEffectsInfo.GameplayEffectsInfo"));
+	// if(Cast<UDataTable>(GameplayEffectsTablePath.ResolveObject()))
+	// {
+	// 	PRINT_DEBUG_MESSAGE(10, FColor::Emerald, FString("DATA TABLE FOUND"));
+	// 	GameplayEffectsDatabase = Cast<UDataTable>(GameplayEffectsTablePath.ResolveObject());
+	// }
+	// else
+	// {
+	// 	PRINT_DEBUG_MESSAGE(10, FColor::Emerald, FString("NOT FOUND NOT FOUND"));
+	// }
 	
 	PlayerControllerClass = AOmniController::StaticClass();
 	PlayerStateClass = AOmniPlayerState::StaticClass();

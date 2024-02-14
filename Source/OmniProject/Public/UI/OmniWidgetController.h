@@ -28,6 +28,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-	
-	
+	UFUNCTION(BlueprintCallable)
+		void InitController(FOmniWidgetControllerParams& ControllerParams);
 };

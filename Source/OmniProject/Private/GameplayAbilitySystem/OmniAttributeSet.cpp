@@ -6,6 +6,8 @@
 
 UOmniAttributeSet::UOmniAttributeSet()
 {
+	InitHealth(50);
+	InitMaxHealth(100);
 }
 
 void UOmniAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

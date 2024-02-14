@@ -19,6 +19,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameplayAbilitySystem/OmniAbilitySystemComponent.h"
 #include "Player/OmniPlayerState.h"
+#include "UI/OmniHUD.h"
 
 AOmniCharacter::AOmniCharacter()
 {
@@ -74,6 +75,20 @@ void AOmniCharacter::InitAbilityActorInfo()
 	Cast<UOmniAbilitySystemComponent>(OmniPlayerState->GetAbilitySystemComponent())->Init();
 	AbilitySystemComponent = OmniPlayerState->GetAbilitySystemComponent();
 	AttributeSet = OmniPlayerState->GetAttributeSet();
+
+	InitHUD();
+}
+
+void AOmniCharacter::InitHUD() const
+{
+	if (AOmniController* OmniController = Cast<AOmniController>(GetController()))
+	{
+		if (AOmniHUD* OmniHUD = Cast<AOmniHUD>(OmniController->GetHUD()))
+		{
+			FOmniWidgetControllerParams WidgetControllerParams(OmniController, GetPlayerState<AOmniPlayerState>(), AttributeSet, AbilitySystemComponent);
+			OmniHUD->InitializeHUD(WidgetControllerParams);
+		}
+	}
 }
 
 UAbilitySystemComponent* AOmniCharacter::GetAbilitySystemComponent() const
