@@ -20,6 +20,6 @@ public:
 		void InitializeWidget(UOmniHUDController* Controller);
 
 protected:
-
+	
 	TObjectPtr<UOmniHUDController> HUDController;
 };

@@ -10,6 +10,8 @@
 #include "Weapons/OmniWeapon.h"
 #include "OmniCharacter.generated.h"
 
+class UOmniAttributeSet;
+class UOmniAbilitySystemComponent;
 class UAnimMontage;
 class UCapsuleComponent;
 class USpringArmComponent;
@@ -17,8 +19,6 @@ class UCameraComponent;
 class UInputComponent;
 class UInputMappingContext;
 class UInputAction;
-class UAttributeSet;
-class UAbilitySystemComponent;
 class UOmniInventory;
 class AOmniItem;
 class AOmniWeapon;
@@ -87,9 +87,9 @@ public:
 	// Ability System
 	//----------------
 	UPROPERTY()
-		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+		TObjectPtr<UOmniAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
-		TObjectPtr<UAttributeSet> AttributeSet;
+		TObjectPtr<UOmniAttributeSet> AttributeSet;
 	
 //==================================
 //Setters, Getters, Inline Functions

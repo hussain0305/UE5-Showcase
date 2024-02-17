@@ -15,9 +15,11 @@ void AOmniHUD::InitializeHUD(FOmniWidgetControllerParams& PlayerDetails)
 
 	HUDController = NewObject<UOmniHUDController>(this, UOmniHUDController::StaticClass());
 	HUDController->InitController(PlayerDetails);
+
+	OnControllerAssigned.Broadcast(HUDController);
 }
 
-void AOmniHUD::BeginPlay()
+UOmniHUDController* AOmniHUD::GetHUDController() const
 {
-	Super::BeginPlay();
+	return HUDController;
 }

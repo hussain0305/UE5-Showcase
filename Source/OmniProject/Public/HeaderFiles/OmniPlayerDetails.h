@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystemComponent.h"
-#include "AttributeSet.h"
 #include "OmniPlayerDetails.generated.h"
 
-class UAbilitySystemComponent;
-class UAttributeSet;
+class UOmniAbilitySystemComponent;
+class UOmniAttributeSet;
+class AOmniPlayerState;
+class AOmniController;
 
 USTRUCT(BlueprintType)
 struct FOmniWidgetControllerParams
@@ -14,18 +14,18 @@ struct FOmniWidgetControllerParams
 	GENERATED_USTRUCT_BODY()
 
 	FOmniWidgetControllerParams() {}
-	FOmniWidgetControllerParams(APlayerController* PlayerControllerParam, APlayerState* PlayerStateParam, UAttributeSet* AttributeSetParam, UAbilitySystemComponent* AbilitySystemParam)
+	FOmniWidgetControllerParams(AOmniController* PlayerControllerParam, AOmniPlayerState* PlayerStateParam, UOmniAttributeSet* AttributeSetParam, UOmniAbilitySystemComponent* AbilitySystemParam)
 	: PlayerController(PlayerControllerParam), PlayerState(PlayerStateParam), AttributeSet(AttributeSetParam), AbilitySystemComponent(AbilitySystemParam) {}
 	
 	UPROPERTY()
-		TObjectPtr<APlayerController> PlayerController;
+		TObjectPtr<AOmniController> PlayerController;
 
 	UPROPERTY()
-		TObjectPtr<APlayerState> PlayerState;
+		TObjectPtr<AOmniPlayerState> PlayerState;
 
 	UPROPERTY()
-		TObjectPtr<UAttributeSet> AttributeSet;
+		TObjectPtr<UOmniAttributeSet> AttributeSet;
 
 	UPROPERTY()
-		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+		TObjectPtr<UOmniAbilitySystemComponent> AbilitySystemComponent;
 };

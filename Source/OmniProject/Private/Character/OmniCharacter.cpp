@@ -18,6 +18,7 @@
 #include "HeaderFiles/OmniGlobal.h"
 #include "Components/CapsuleComponent.h"
 #include "GameplayAbilitySystem/OmniAbilitySystemComponent.h"
+#include "GameplayAbilitySystem/OmniAttributeSet.h"
 #include "Player/OmniPlayerState.h"
 #include "UI/OmniHUD.h"
 
@@ -73,8 +74,8 @@ void AOmniCharacter::InitAbilityActorInfo()
 	check(OmniPlayerState);
 	OmniPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(OmniPlayerState, this);
 	Cast<UOmniAbilitySystemComponent>(OmniPlayerState->GetAbilitySystemComponent())->Init();
-	AbilitySystemComponent = OmniPlayerState->GetAbilitySystemComponent();
-	AttributeSet = OmniPlayerState->GetAttributeSet();
+	AbilitySystemComponent = Cast<UOmniAbilitySystemComponent>(OmniPlayerState->GetAbilitySystemComponent());
+	AttributeSet = Cast<UOmniAttributeSet>(OmniPlayerState->GetAttributeSet());
 
 	InitHUD();
 }

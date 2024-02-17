@@ -2,6 +2,9 @@
 
 
 #include "UI/OmniHUDController.h"
+
+#include "GameplayAbilitySystem/OmniAbilitySystemComponent.h"
+#include "GameplayAbilitySystem/OmniAttributeSet.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "HeaderFiles/OmniPlayerDetails.h"
 
@@ -12,10 +15,29 @@ void UOmniHUDController::InitController(FOmniWidgetControllerParams& ControllerP
 	AbilitySystemComponent	= ControllerParams.AbilitySystemComponent;
 	AttributeSet			= ControllerParams.AttributeSet;
 
-	PRINT_DEBUG_MESSAGE(5, FColor::Green, FString("EVERYTHINBG INITIALIZED!!!!"));
+	SetupCallbacksAndDelegates();
+	BroadcastInitialValues();
 }
 
-void UOmniHUDController::BroadcastInitialValues()
+void UOmniHUDController::BroadcastInitialValues() const
 {
-	
+	PRINT_DEBUG_MESSAGE(5, FColor::Green, FString("Broadcasting Initial Values"));
+	OnHealthChanged.Broadcast(AttributeSet->GetHealth());
+	OnMaxHealthChanged.Broadcast(AttributeSet->GetMaxHealth());
+}
+
+void UOmniHUDController::SetupCallbacksAndDelegates()
+{
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &UOmniHUDController::HealthChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UOmniHUDController::MaxHealthChanged);
+}
+
+void UOmniHUDController::HealthChanged(const FOnAttributeChangeData& Data) const
+{
+	OnHealthChanged.Broadcast(Data.NewValue);
+}
+
+void UOmniHUDController::MaxHealthChanged(const FOnAttributeChangeData& Data) const
+{
+	OnMaxHealthChanged.Broadcast(Data.NewValue);
 }

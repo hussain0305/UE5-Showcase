@@ -9,9 +9,9 @@
 
 class UOmniHUDController;
 class UOmniUserWidget;
-/**
- * 
- */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FControllerAssignedSignature, UOmniHUDController*, Controller);
+
 UCLASS()
 class OMNIPROJECT_API AOmniHUD : public AHUD
 {
@@ -24,14 +24,19 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 		TObjectPtr<UOmniUserWidget> HUDOverlayWidget;
+	
+	UFUNCTION()
+		void InitializeHUD(FOmniWidgetControllerParams& PlayerDetails);
 
+	UFUNCTION(BlueprintCallable)
+		UOmniHUDController* GetHUDController() const;
+
+	UPROPERTY(BlueprintAssignable, Category = "Controller Assigned Delegate")
+		FControllerAssignedSignature OnControllerAssigned;
+	
+protected:
+	
 	UPROPERTY(BlueprintReadOnly)
 		TObjectPtr<UOmniHUDController> HUDController;
 
-
-	UFUNCTION()
-		void InitializeHUD(FOmniWidgetControllerParams& PlayerDetails);
-protected:
-
-	virtual void BeginPlay() override;
 };

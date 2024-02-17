@@ -3,11 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "OmniHUDController.generated.h"
 
-class UAttributeSet;
-class UAbilitySystemComponent;
+struct FOnAttributeChangeData;
+class AOmniController;
+class AOmniPlayerState;
+class UOmniAttributeSet;
+class UOmniAbilitySystemComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewMaxHealth);
 
 UCLASS()
 class OMNIPROJECT_API UOmniHUDController : public UObject
@@ -19,20 +24,35 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void InitController(FOmniWidgetControllerParams& ControllerParams);
 
-	virtual void BroadcastInitialValues();
+	void BroadcastInitialValues() const;
+	void SetupCallbacksAndDelegates();
 
 protected:
+
+//=================
+//Controller Fields
+//=================
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
+		TObjectPtr<AOmniController> PlayerController;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
+		TObjectPtr<AOmniPlayerState> PlayerState;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
+		TObjectPtr<UOmniAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
+		TObjectPtr<UOmniAttributeSet> AttributeSet;
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-		TObjectPtr<APlayerController> PlayerController;
+//================================
+//Broadcasters And Bound Functions
+//================================
+	UPROPERTY(BlueprintAssignable, Category = "Attribute Change Delegate")
+		FOnHealthChangedSignature OnHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Attribute Change Delegate")
+		FOnMaxHealthChangedSignature OnMaxHealthChanged;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-		TObjectPtr<APlayerState> PlayerState;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-		TObjectPtr<UAttributeSet> AttributeSet;
-
+	void HealthChanged(const FOnAttributeChangeData& Data) const;
+	void MaxHealthChanged(const FOnAttributeChangeData& Data) const;
 };
