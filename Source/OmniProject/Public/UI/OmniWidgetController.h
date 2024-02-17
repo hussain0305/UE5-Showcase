@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "OmniWidgetController.generated.h"
 
+class UOmniHUDController;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -16,18 +16,10 @@ class OMNIPROJECT_API UOmniWidgetController : public UObject
 
 public:
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-	TObjectPtr<APlayerController> PlayerController;
+	UFUNCTION()
+		void InitializeWidget(UOmniHUDController* Controller);
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-	TObjectPtr<APlayerState> PlayerState;
+protected:
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player")
-	TObjectPtr<UAttributeSet> AttributeSet;
-
-	UFUNCTION(BlueprintCallable)
-		void InitController(FOmniWidgetControllerParams& ControllerParams);
+	TObjectPtr<UOmniHUDController> HUDController;
 };

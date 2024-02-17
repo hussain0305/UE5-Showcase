@@ -7,7 +7,7 @@
 #include "HeaderFiles/OmniPlayerDetails.h"
 #include "OmniHUD.generated.h"
 
-class UOmniWidgetController;
+class UOmniHUDController;
 class UOmniUserWidget;
 /**
  * 
@@ -26,7 +26,7 @@ public:
 		TObjectPtr<UOmniUserWidget> HUDOverlayWidget;
 
 	UPROPERTY(BlueprintReadOnly)
-		TObjectPtr<UOmniWidgetController> WidgetController;
+		TObjectPtr<UOmniHUDController> HUDController;
 
 
 	UFUNCTION()

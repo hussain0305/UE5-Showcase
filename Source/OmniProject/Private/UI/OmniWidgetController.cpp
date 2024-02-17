@@ -5,10 +5,7 @@
 #include "HeaderFiles/DebugMacros.h"
 #include "HeaderFiles/OmniPlayerDetails.h"
 
-void UOmniWidgetController::InitController(FOmniWidgetControllerParams& ControllerParams)
+void UOmniWidgetController::InitializeWidget(UOmniHUDController* Controller)
 {
-	PlayerController		= ControllerParams.PlayerController;
-	PlayerState				= ControllerParams.PlayerState;
-	AbilitySystemComponent	= ControllerParams.AbilitySystemComponent;
-	AttributeSet			= ControllerParams.AttributeSet;
+	HUDController = Controller;
 }
