@@ -3,3 +3,12 @@
 
 #include "Game/OmniGameInstance.h"
 
+EOmniCharacterClass UOmniGameInstance::GetLocalPlayerSelectedCharacterClass() const
+{
+	return SelectedCharacterClass;
+}
+
+void UOmniGameInstance::SetLocalPlayerSelectedCharacterClass(EOmniCharacterClass CharacterClass)
+{
+	SelectedCharacterClass = CharacterClass;
+}

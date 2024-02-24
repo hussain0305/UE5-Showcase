@@ -3,28 +3,30 @@
 
 #include "Game/OmniGameModeBase.h"
 
+#include "Game/OmniGameInstance.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "HeaderFiles/OmniGameplayEffectsTable.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/OmniController.h"
 #include "Player/OmniPlayerState.h"
 
 AOmniGameModeBase::AOmniGameModeBase()
 {
+	//Assign a default pawn 
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/Blueprints_Character/BaseCharacter.BaseCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	// FSoftObjectPath GameplayEffectsTablePath = FSoftObjectPath(TEXT("/Game/Data/GameplayEffectsInfo.GameplayEffectsInfo"));
-	// if(Cast<UDataTable>(GameplayEffectsTablePath.ResolveObject()))
+	//Check if a pawn has been selected in the character selection class and assign that if available
+	// if (TObjectPtr<UOmniGameInstance> GameInstance = Cast<UOmniGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
 	// {
-	// 	PRINT_DEBUG_MESSAGE(10, FColor::Emerald, FString("DATA TABLE FOUND"));
-	// 	GameplayEffectsDatabase = Cast<UDataTable>(GameplayEffectsTablePath.ResolveObject());
-	// }
-	// else
-	// {
-	// 	PRINT_DEBUG_MESSAGE(10, FColor::Emerald, FString("NOT FOUND NOT FOUND"));
+	// 	EOmniCharacterClass SelectedCharacterClass = GameInstance->GetLocalPlayerSelectedCharacterClass();
+	// 	if (SelectedCharacterClass != EOmniCharacterClass::None)
+	// 	{
+	// 		
+	// 	}
 	// }
 	
 	PlayerControllerClass = AOmniController::StaticClass();

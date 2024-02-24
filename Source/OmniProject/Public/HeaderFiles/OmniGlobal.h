@@ -52,3 +52,11 @@ enum class EItemState : uint8
 	Equipped			UMETA(DisplayName = "Equipped"),
 	Sheathed			UMETA(DisplayName = "Sheathed")
 };
+
+UENUM(BlueprintType)
+enum class EOmniCharacterClass
+{
+	None		UMETA(DisplayName = "None"),
+	Modern		UMETA(DisplayName = "Modern"),
+	Medieval	UMETA(DisplayName = "Medieval")
+};
