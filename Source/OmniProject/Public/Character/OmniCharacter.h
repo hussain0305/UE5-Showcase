@@ -4,6 +4,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "HeaderFiles/OmniGlobal.h"
 #include "Interfaces/Damageable.h"
 #include "Player/OmniInventory.h"
