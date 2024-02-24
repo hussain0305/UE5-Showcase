@@ -3,6 +3,7 @@
 
 #include "Game/OmniGameModeBase.h"
 
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Game/OmniGameInstance.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "HeaderFiles/OmniGameplayEffectsTable.h"
@@ -31,6 +32,20 @@ AOmniGameModeBase::AOmniGameModeBase()
 	
 	PlayerControllerClass = AOmniController::StaticClass();
 	PlayerStateClass = AOmniPlayerState::StaticClass();
+}
+
+void AOmniGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+	if (const UWorld* World= GetWorld())
+	{
+		// Is this the proper, industry-standard way to do this? Using UWidgetBlueprintLibrary here doesn't make sense to me
+		if (APlayerController* LocPlayerController = World->GetFirstPlayerController())
+		{
+			const FInputModeGameOnly InputModeGameOnly;
+			LocPlayerController->SetInputMode(InputModeGameOnly);
+		}
+	}
 }
 
 bool AOmniGameModeBase::GetGameplayEffectDetails(FName RowName, FOmniGameplayEffectsDatabase& DatabaseRow)

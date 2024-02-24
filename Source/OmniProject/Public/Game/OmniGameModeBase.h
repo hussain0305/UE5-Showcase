@@ -16,7 +16,8 @@ class OMNIPROJECT_API AOmniGameModeBase : public AGameModeBase
 public:
 
 	AOmniGameModeBase();
-
+	virtual void BeginPlay() override;
+	
 	UPROPERTY(VisibleAnywhere)
 		UDataTable* GameplayEffectsDatabase;
 
