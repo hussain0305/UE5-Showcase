@@ -45,6 +45,11 @@ void AOmniGameModeBase::BeginPlay()
 	{
 		if (const TSubclassOf<AOmniCharacter> SelectedCharacterClass = GameInstance->GetLocalPlayerSelectedCharacterClass())
 		{
+			if(APawn* ExistingPlayerCharacter = LocPlayerController->GetPawn())
+			{
+				World->DestroyActor(ExistingPlayerCharacter);
+			}
+			
 			const TObjectPtr<AOmniCharacter> SpawnedPlayerCharacter = World->SpawnActor<AOmniCharacter>(SelectedCharacterClass);
 			LocPlayerController->Possess(SpawnedPlayerCharacter);
 		}
