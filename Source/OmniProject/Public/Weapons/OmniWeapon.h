@@ -58,6 +58,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
 		UAnimMontage* AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
+		int8 StationaryAttackSectionNumber = 1;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
+		int8 RunningAttackSectionNumber = -1;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
+		int8 FalingAttackSectionNumber = -1;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation|Weapon Handling")
 		UAnimMontage* SheathMontage;
 
@@ -78,6 +87,9 @@ public:
 //=========
 
 	virtual void SetItemState(const EItemState NewState) override;
+
+	UFUNCTION(BlueprintCallable)
+		int32 GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState);
 	
 protected:
 

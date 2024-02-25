@@ -124,7 +124,7 @@ public:
 	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanSheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanUnsheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle;}
-
+	
 	//---------------
 	// Ability System
 	//---------------
@@ -174,6 +174,12 @@ public:
 	UFUNCTION()
 		void DropWeapon(AOmniWeapon* WeaponToDrop);
 
+	//-------
+	// Others
+	//-------
+
+	UFUNCTION(BlueprintCallable)
+		ECharacterLocomotionState GetLocomotionState();
 protected:
 
 	virtual void BeginPlay() override;

@@ -79,3 +79,13 @@ struct FPlayableCharactersTable : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TObjectPtr<UTexture2D> DisplayImage;
 };
+
+UENUM(BlueprintType)
+enum class ECharacterLocomotionState
+{
+	Undetermined		UMETA(DisplayName = "Undetermined"),
+	Stationary			UMETA(DisplayName = "Stationary"),
+	Walking				UMETA(DisplayName = "Walking"),
+	Running				UMETA(DisplayName = "Running"),
+	Falling				UMETA(DisplayName = "Falling")
+};

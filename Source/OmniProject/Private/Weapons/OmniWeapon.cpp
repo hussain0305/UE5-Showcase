@@ -22,23 +22,6 @@ AOmniWeapon::AOmniWeapon()
 	WeaponBox->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
 }
 
-void AOmniWeapon::SetItemState(const EItemState NewState)
-{
-	Super::SetItemState(NewState);
-	switch(GetItemState())
-	{
-	case EItemState::Equipped:
-		WeaponBox->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
-		break;
-	case EItemState::Sheathed:
-		WeaponBox->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
-		break;
-	case EItemState::Pickup:
-		WeaponBox->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
-		break;
-	}
-}
-
 void AOmniWeapon::BeginPlay()
 {
 	Super::BeginPlay();
@@ -108,4 +91,37 @@ void AOmniWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		true);
 }
 		
-		
+void AOmniWeapon::SetItemState(const EItemState NewState)
+{
+	Super::SetItemState(NewState);
+	switch(GetItemState())
+	{
+	case EItemState::Equipped:
+		WeaponBox->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
+		break;
+	case EItemState::Sheathed:
+		WeaponBox->SetCollisionProfileName(WEAPON_COLLISION_PROFILE);
+		break;
+	case EItemState::Pickup:
+		WeaponBox->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
+		break;
+	}
+}
+
+int32 AOmniWeapon::GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState)
+{
+	switch (LocomotionState)
+	{
+		case ECharacterLocomotionState::Stationary:
+			return StationaryAttackSectionNumber;
+
+		case ECharacterLocomotionState::Falling:
+			return FalingAttackSectionNumber;
+			
+		case ECharacterLocomotionState::Running:
+			return RunningAttackSectionNumber;
+
+		default:
+			return FMath::RandRange(1,NumAttackOptions);;
+	}
+}

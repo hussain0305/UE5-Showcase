@@ -425,10 +425,17 @@ void AOmniCharacter::StopAimInput()
 void AOmniCharacter::PrimaryAttackAction()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	UAnimMontage* AttackMontage = GetInventory()->GetWieldedWeapon()->AttackMontage;
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+
+	if (WieldedWeapon == nullptr)
+	{
+		return;
+	}
+	
+	UAnimMontage* AttackMontage = WieldedWeapon->AttackMontage;
 	if (AnimInstance && AttackMontage)
 	{
-		const int32 SectionToPlay = FMath::RandRange(1,GetInventory()->GetWieldedWeapon()->NumAttackOptions);
+		const int8 SectionToPlay = WieldedWeapon->GetMontageSectionToPlay(GetLocomotionState());
 		std::string SectionName = "Attack";
 		SectionName += std::to_string(SectionToPlay);
 		AnimInstance->Montage_Play(AttackMontage);
@@ -511,4 +518,18 @@ void AOmniCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+ECharacterLocomotionState AOmniCharacter::GetLocomotionState()
+{
+	if (GetMovementComponent()->IsFalling())
+	{
+		return ECharacterLocomotionState::Falling;
+	}
+	if (GetMovementComponent()->Velocity.Length() > 0)
+	{
+		return ECharacterLocomotionState::Running;
+	}
+
+	return ECharacterLocomotionState::Stationary;
 }
