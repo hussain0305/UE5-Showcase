@@ -15,12 +15,11 @@ class OMNIPROJECT_API UOmniGameInstance : public UGameInstance
 public:
 
 	UFUNCTION(BlueprintCallable)
-	EOmniCharacterClass GetLocalPlayerSelectedCharacterClass() const;
+		TSubclassOf<AOmniCharacter> GetLocalPlayerSelectedCharacterClass() const;
 
 	UFUNCTION(BlueprintCallable)
-	void SetLocalPlayerSelectedCharacterClass(EOmniCharacterClass CharacterClass);
+		void SetLocalPlayerSelectedCharacterClass(TSubclassOf<AOmniCharacter> CharacterClass);
 
-	
 private:
-	EOmniCharacterClass SelectedCharacterClass;
+	TSubclassOf<AOmniCharacter> SelectedCharacterClass;
 };

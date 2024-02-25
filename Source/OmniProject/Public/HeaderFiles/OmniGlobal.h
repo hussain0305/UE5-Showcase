@@ -4,6 +4,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "OmniGlobal.generated.h"
 
+class AOmniCharacter;
 class AOmniWeapon;
 
 static FName WEAPON_COLLISION_PROFILE = "OmniWeaponCollision";
@@ -59,4 +60,22 @@ enum class EOmniCharacterClass
 	None		UMETA(DisplayName = "None"),
 	Modern		UMETA(DisplayName = "Modern"),
 	Medieval	UMETA(DisplayName = "Medieval")
+};
+
+USTRUCT(BlueprintType)
+struct FPlayableCharactersTable : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EOmniCharacterClass CharacterClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<AOmniCharacter> CharacterBlueprint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TObjectPtr<UTexture2D> DisplayImage;
 };

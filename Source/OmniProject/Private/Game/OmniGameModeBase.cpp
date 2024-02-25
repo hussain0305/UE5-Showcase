@@ -2,8 +2,8 @@
 
 
 #include "Game/OmniGameModeBase.h"
-
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Character/OmniCharacter.h"
 #include "Game/OmniGameInstance.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "HeaderFiles/OmniGameplayEffectsTable.h"
@@ -14,21 +14,11 @@
 AOmniGameModeBase::AOmniGameModeBase()
 {
 	//Assign a default pawn 
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/Blueprints_Character/BaseCharacter.BaseCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/Blueprints_Character/BaseCharacter_Medieval.BaseCharacter_Medieval"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
-
-	//Check if a pawn has been selected in the character selection class and assign that if available
-	// if (TObjectPtr<UOmniGameInstance> GameInstance = Cast<UOmniGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
-	// {
-	// 	EOmniCharacterClass SelectedCharacterClass = GameInstance->GetLocalPlayerSelectedCharacterClass();
-	// 	if (SelectedCharacterClass != EOmniCharacterClass::None)
-	// 	{
-	// 		
-	// 	}
-	// }
 	
 	PlayerControllerClass = AOmniController::StaticClass();
 	PlayerStateClass = AOmniPlayerState::StaticClass();
@@ -37,15 +27,33 @@ AOmniGameModeBase::AOmniGameModeBase()
 void AOmniGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	if (const UWorld* World= GetWorld())
+	
+	UWorld* World= GetWorld();
+	if (World == nullptr)
 	{
-		// Is this the proper, industry-standard way to do this? Using UWidgetBlueprintLibrary here doesn't make sense to me
-		if (APlayerController* LocPlayerController = World->GetFirstPlayerController())
+		return;
+	}
+
+	APlayerController* LocPlayerController = World->GetFirstPlayerController();
+	if (LocPlayerController == nullptr)
+	{
+		return;
+	}
+
+	// Check if a pawn has been selected in the character selection class and assign that if available
+	if (const TObjectPtr<UOmniGameInstance> GameInstance = Cast<UOmniGameInstance>(UGameplayStatics::GetGameInstance(World)))
+	{
+		if (const TSubclassOf<AOmniCharacter> SelectedCharacterClass = GameInstance->GetLocalPlayerSelectedCharacterClass())
 		{
-			const FInputModeGameOnly InputModeGameOnly;
-			LocPlayerController->SetInputMode(InputModeGameOnly);
+			const TObjectPtr<AOmniCharacter> SpawnedPlayerCharacter = World->SpawnActor<AOmniCharacter>(SelectedCharacterClass);
+			LocPlayerController->Possess(SpawnedPlayerCharacter);
 		}
 	}
+	
+	// Is this the proper, industry-standard way to assign input mode? Using UWidgetBlueprintLibrary here doesn't make sense to me
+	const FInputModeGameOnly InputModeGameOnly;
+	LocPlayerController->SetInputMode(InputModeGameOnly);
+
 }
 
 bool AOmniGameModeBase::GetGameplayEffectDetails(FName RowName, FOmniGameplayEffectsDatabase& DatabaseRow)
