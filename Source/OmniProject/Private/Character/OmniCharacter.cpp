@@ -21,6 +21,7 @@
 #include "GameplayAbilitySystem/OmniAttributeSet.h"
 #include "Player/OmniPlayerState.h"
 #include "UI/OmniHUD.h"
+#include <string>
 
 AOmniCharacter::AOmniCharacter()
 {

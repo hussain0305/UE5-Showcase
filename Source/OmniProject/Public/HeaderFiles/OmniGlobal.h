@@ -55,7 +55,7 @@ enum class EItemState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EOmniCharacterClass
+enum class EOmniCharacterClass : uint8
 {
 	None		UMETA(DisplayName = "None"),
 	Modern		UMETA(DisplayName = "Modern"),
@@ -81,7 +81,7 @@ struct FPlayableCharactersTable : public FTableRowBase
 };
 
 UENUM(BlueprintType)
-enum class ECharacterLocomotionState
+enum class ECharacterLocomotionState : uint8
 {
 	Undetermined		UMETA(DisplayName = "Undetermined"),
 	Stationary			UMETA(DisplayName = "Stationary"),
