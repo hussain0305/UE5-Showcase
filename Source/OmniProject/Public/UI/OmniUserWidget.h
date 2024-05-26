@@ -26,9 +26,19 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void HUDControllerInitialized(UOmniHUDController* Controller);
-
-	UFUNCTION(BlueprintImplementableEvent)
+	
+	UFUNCTION()
 		void StartListening();
+
+	UFUNCTION()
+		virtual void InitHUDValue();
+	
+	UFUNCTION()
+		virtual void BindListenerDelegate();
+	
+	UFUNCTION()
+		virtual void UpdateValue(float newValue);
+	
 protected:
 
 	virtual void NativeConstruct() override;

@@ -27,6 +27,22 @@ public:
 	void BroadcastInitialValues() const;
 	void SetupCallbacksAndDelegates();
 
+	
+//==================
+//Setter and Getters
+//==================
+
+	FORCEINLINE TObjectPtr<UOmniAttributeSet> GetAttributeSet() const{ return AttributeSet; }
+
+//================================
+//Broadcasters And Bound Functions
+//================================
+	UPROPERTY(BlueprintAssignable, Category = "Attribute Change Delegate")
+	FOnHealthChangedSignature OnHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category = "Attribute Change Delegate")
+	FOnMaxHealthChangedSignature OnMaxHealthChanged;
+
 protected:
 
 //=================
@@ -47,12 +63,6 @@ protected:
 //================================
 //Broadcasters And Bound Functions
 //================================
-	UPROPERTY(BlueprintAssignable, Category = "Attribute Change Delegate")
-		FOnHealthChangedSignature OnHealthChanged;
-	
-	UPROPERTY(BlueprintAssignable, Category = "Attribute Change Delegate")
-		FOnMaxHealthChangedSignature OnMaxHealthChanged;
-
 	void HealthChanged(const FOnAttributeChangeData& Data) const;
 	void MaxHealthChanged(const FOnAttributeChangeData& Data) const;
 };

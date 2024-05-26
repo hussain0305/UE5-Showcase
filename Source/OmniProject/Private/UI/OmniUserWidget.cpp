@@ -28,3 +28,12 @@ void UOmniUserWidget::HUDControllerInitialized(UOmniHUDController* Controller)
 	StartListening();
 }
 
+void UOmniUserWidget::StartListening()
+{
+	InitHUDValue();
+	BindListenerDelegate();
+}
+
+void UOmniUserWidget::InitHUDValue() {}
+void UOmniUserWidget::BindListenerDelegate() {}
+void UOmniUserWidget::UpdateValue(float newValue) {}
