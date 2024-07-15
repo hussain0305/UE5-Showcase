@@ -4,6 +4,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "HeaderFiles/OmniGlobal.h"
 #include "Interfaces/Damageable.h"
@@ -118,7 +119,7 @@ public:
 	//---------------
 	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
-	FORCEINLINE bool GetCanPerformPrimaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetCanPerformPrimaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped && !GetCharacterMovement()->IsFalling();}
 	FORCEINLINE bool GetCanAim() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction;}
 	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
