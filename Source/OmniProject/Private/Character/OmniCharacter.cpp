@@ -34,7 +34,8 @@ AOmniCharacter::AOmniCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("Camera Boom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetArmLength = 300.0f;
-
+	CameraBoom->bUsePawnControlRotation = true;
+	
 	//Setup Camera
 	Camera = CreateDefaultSubobject<UCameraComponent>(FName("Camera"));
 	Camera->SetupAttachment(CameraBoom);
@@ -42,9 +43,9 @@ AOmniCharacter::AOmniCharacter()
 
 	//Controller
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
-	GetCharacterMovement()->bOrientRotationToMovement;
+	// GetCharacterMovement()->bOrientRotationToMovement;
 	GetCharacterMovement()->RotationRate = FRotator(0, 400.0f, 0);
 
 	//Initialize Supporting stuff
@@ -455,7 +456,7 @@ void AOmniCharacter::StartAim()
 		SecondaryActionMontage->bLoop = true;
 		AnimInstance->Montage_Play(SecondaryActionMontage);
 		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Aim, SecondaryActionMontage);
-		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 0.5f);
+		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
 		SetCharacterActionState(ECharacterActionState::AimStart_SecondaryAction);
 	}
 }
@@ -500,7 +501,7 @@ void AOmniCharacter::SecondaryAttackAction()
 		SecondaryActionMontage->bLoop = false;
 		AnimInstance->Montage_Play(SecondaryActionMontage);
 		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Attack, SecondaryActionMontage);
-		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 2.f);
+		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 5.f);
 		SetCharacterActionState(ECharacterActionState::Attacking_SecondaryAction);
 	}
 }
