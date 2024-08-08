@@ -24,6 +24,8 @@ public:
 		class UCharacterMovementComponent* OmniCharacterMovement;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
 		float GroundSpeed;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
+		float Direction;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Character State")
 		ECharacterWieldState CharacterWieldState;
 

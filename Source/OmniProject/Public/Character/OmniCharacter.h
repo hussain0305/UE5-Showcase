@@ -119,12 +119,14 @@ public:
 	//---------------
 	FORCEINLINE ECharacterActionState GetCharacterActionState() const { return CharacterActionState;}
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
-	FORCEINLINE bool GetCanPerformPrimaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped && !GetCharacterMovement()->IsFalling();}
+	FORCEINLINE bool GetCanPerformPrimaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped && !GetIsInSecondaryAttackLoop();}
 	FORCEINLINE bool GetCanAim() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
-	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction;}
-	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Aiming_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::AimDone_SecondaryAction;}
+	FORCEINLINE bool GetStartedAiming() const { return CharacterActionState == ECharacterActionState::AimStart_SecondaryAction;}
+	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::AimDone_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanSheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanUnsheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle;}
+	FORCEINLINE bool GetIsInSecondaryAttackLoop() const { return CharacterActionState == ECharacterActionState::AimStart_SecondaryAction || CharacterActionState == ECharacterActionState::AimDone_SecondaryAction;}
 	
 	//---------------
 	// Ability System
@@ -174,6 +176,8 @@ public:
 		void EquipWeaponOfTypeFromInventory(EWeaponType WeaponType);
 	UFUNCTION()
 		void DropWeapon(AOmniWeapon* WeaponToDrop);
+	UFUNCTION()
+		void AimStay();
 
 	//-------
 	// Others

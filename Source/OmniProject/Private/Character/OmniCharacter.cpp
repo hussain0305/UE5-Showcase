@@ -452,9 +452,25 @@ void AOmniCharacter::StartAim()
 	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
 	if (AnimInstance && SecondaryActionMontage)
 	{
+		SecondaryActionMontage->bLoop = true;
 		AnimInstance->Montage_Play(SecondaryActionMontage);
 		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Aim, SecondaryActionMontage);
-		SetCharacterActionState(ECharacterActionState::Aiming_SecondaryAction);
+		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 0.5f);
+		SetCharacterActionState(ECharacterActionState::AimStart_SecondaryAction);
+	}
+}
+
+void AOmniCharacter::AimStay()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
+	if (AnimInstance && SecondaryActionMontage)
+	{
+		SecondaryActionMontage->bLoop = true;
+		AnimInstance->Montage_Play(SecondaryActionMontage);
+		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_AimStay, SecondaryActionMontage);
+		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
+		SetCharacterActionState(ECharacterActionState::AimDone_SecondaryAction);
 	}
 }
 
@@ -477,13 +493,14 @@ void AOmniCharacter::SecondaryAttackAction()
 	{
 		return;
 	}
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("AXE THROW!!!!"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
 	if (AnimInstance && SecondaryActionMontage)
 	{
+		SecondaryActionMontage->bLoop = false;
 		AnimInstance->Montage_Play(SecondaryActionMontage);
 		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Attack, SecondaryActionMontage);
+		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 2.f);
 		SetCharacterActionState(ECharacterActionState::Attacking_SecondaryAction);
 	}
 }

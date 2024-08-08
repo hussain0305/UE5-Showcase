@@ -1,7 +1,9 @@
 #include "Character/OmniAnimInstance.h"
+#include "KismetAnimationLibrary.h"
 #include "Character/OmniCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "HeaderFiles/DebugMacros.h"
 
 void UOmniAnimInstance::NativeInitializeAnimation()
 {
@@ -25,6 +27,7 @@ void UOmniAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	if (OmniCharacterMovement)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(OmniCharacterMovement->Velocity);
+		Direction = UKismetAnimationLibrary::CalculateDirection(OmniCharacterMovement->Velocity, OmniCharacter->GetActorRotation());
 	}
 }
 

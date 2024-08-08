@@ -80,6 +80,9 @@ public:
 		FName SecondaryActionMontage_Aim;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
+		FName SecondaryActionMontage_AimStay;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
 		FName SecondaryActionMontage_Attack;
 	
 //=========
