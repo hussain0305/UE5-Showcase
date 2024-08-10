@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
 		EWeaponType WeaponType;
 
+	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
+		FName WeaponID;
+
 	//-----------------
 	// Weapon Hit Trace
 	//-----------------
