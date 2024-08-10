@@ -23,31 +23,31 @@ public:
 //=====================================
 
 	UPROPERTY(EditAnywhere, Category = "Character Item Component")
-		TObjectPtr<UStaticMeshComponent> ScabbardMesh;
+	TObjectPtr<UStaticMeshComponent> ScabbardMesh;
 
 	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
-		EWeaponType WeaponType;
+	EWeaponType WeaponType;
 
 	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
-		FName WeaponID;
+	FName WeaponID;
 
 	//-----------------
 	// Weapon Hit Trace
 	//-----------------
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Trace")
-		UBoxComponent* WeaponBox;
+	UBoxComponent* WeaponBox;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Trace")
-		USceneComponent* WeaponTraceTransforms;
+	USceneComponent* WeaponTraceTransforms;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Trace")
-		USceneComponent* WeaponTraceStart;
+	USceneComponent* WeaponTraceStart;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Trace")
-		USceneComponent* WeaponTraceEnd;
+	USceneComponent* WeaponTraceEnd;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Trace")
-		FVector WeaponHitTraceSize = FVector(2.f,2.f,2.f);
+	FVector WeaponHitTraceSize = FVector(2.f,2.f,2.f);
 	
 //=========
 //Functions
@@ -56,10 +56,12 @@ public:
 	virtual void SetItemState(const EItemState NewState) override;
 
 	UFUNCTION(BlueprintCallable)
-		int32 GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState);
+	int32 GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState);
 
 	UFUNCTION(BlueprintCallable)
 	FOmniWeaponTable GetWeaponConfig();
+
+	virtual void PerformSecondaryAction(TObjectPtr<class AOmniCharacter> OwningCharacter);
 
 protected:
 
@@ -69,7 +71,7 @@ protected:
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 	UFUNCTION()
-		virtual void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void AssertWeaponConfig();
 

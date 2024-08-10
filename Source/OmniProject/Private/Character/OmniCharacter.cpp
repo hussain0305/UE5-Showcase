@@ -514,6 +514,14 @@ void AOmniCharacter::AimStay()
 	}
 }
 
+void AOmniCharacter::PerformSecondaryWeaponAction()
+{
+	if (GetInventory()->GetWieldedWeapon())
+	{
+		GetInventory()->GetWieldedWeapon()->PerformSecondaryAction(this);
+	}
+}
+
 void AOmniCharacter::StopAim()
 {
 	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();

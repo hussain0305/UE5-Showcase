@@ -6,12 +6,10 @@
 #include "AnimNotifies/OmniAnimNotify.h"
 #include "OmniSecondaryAttackNotify.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class OMNIPROJECT_API UOmniSecondaryAttackNotify : public UOmniAnimNotify
 {
 	GENERATED_BODY()
-	
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 };

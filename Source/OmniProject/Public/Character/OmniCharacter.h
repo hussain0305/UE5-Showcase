@@ -179,6 +179,8 @@ public:
 		void DropWeapon(AOmniWeapon* WeaponToDrop);
 	UFUNCTION()
 		void AimStay();
+	UFUNCTION()
+		void PerformSecondaryWeaponAction();
 
 	//-------
 	// Others
