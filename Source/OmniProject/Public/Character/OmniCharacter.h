@@ -12,6 +12,7 @@
 #include "Weapons/OmniWeapon.h"
 #include "OmniCharacter.generated.h"
 
+class UOmniAnimInstance;
 class UOmniAttributeSet;
 class UOmniAbilitySystemComponent;
 class UAnimMontage;
@@ -184,6 +185,9 @@ public:
 	//-------
 
 	UFUNCTION(BlueprintCallable)
+		UOmniAnimInstance* GetOmniAnimInstance();
+
+	UFUNCTION(BlueprintCallable)
 		ECharacterLocomotionState GetLocomotionState();
 protected:
 
@@ -238,6 +242,8 @@ private:
 		ECharacterActionState CharacterActionState = ECharacterActionState::Idle;
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<UOmniInventory> Inventory;
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<UOmniAnimInstance> OmniAnimInstance;
 
 //=================
 //Private Functions

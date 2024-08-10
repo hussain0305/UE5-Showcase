@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Items/OmniItem.h"
+#include "HeaderFiles/OmniWeaponTable.h"
 #include "OmniWeapon.generated.h"
 
 class UStaticMeshComponent;
@@ -47,46 +48,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Trace")
 		FVector WeaponHitTraceSize = FVector(2.f,2.f,2.f);
-
-	//-----------------
-	// Weapon Hit Trace
-	//-----------------
-	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-		int NumAttackOptions = 1;
-
-	//-------------------
-	// Animation Montages
-	//-------------------
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
-		UAnimMontage* AttackMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
-		int8 StationaryAttackSectionNumber = 1;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
-		int8 RunningAttackSectionNumber = -1;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Primary Action")
-		int8 FalingAttackSectionNumber = -1;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Weapon Handling")
-		UAnimMontage* SheathMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Weapon Handling")
-		UAnimMontage* UnsheathMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
-		UAnimMontage* SecondaryActionMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
-		FName SecondaryActionMontage_Aim;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
-		FName SecondaryActionMontage_AimStay;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Animation|Secondary Action")
-		FName SecondaryActionMontage_Attack;
 	
 //=========
 //Functions
@@ -96,7 +57,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		int32 GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState);
-	
+
+	UFUNCTION(BlueprintCallable)
+	FOmniWeaponTable GetWeaponConfig();
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -106,4 +70,14 @@ protected:
 
 	UFUNCTION()
 		virtual void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void AssertWeaponConfig();
+
+private:
+	//---------------------
+	// Weapon Configuration
+	//---------------------
+
+	FOmniWeaponTable WeaponConfig;
+	bool WeaponConfigFetched = false;
 };

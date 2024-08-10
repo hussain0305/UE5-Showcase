@@ -5,6 +5,7 @@
 #include "Character/OmniCharacter.h"
 #include "Game/OmniGameInstance.h"
 #include "HeaderFiles/OmniGameplayEffectsTable.h"
+#include "HeaderFiles/OmniWeaponTable.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/OmniController.h"
 #include "Player/OmniPlayerState.h"
@@ -69,6 +70,23 @@ bool AOmniGameModeBase::GetGameplayEffectDetails(FName RowName, FOmniGameplayEff
 			DatabaseRow = *GameplayEffectsDatabase->FindRow<FOmniGameplayEffectsDatabase>(RowName, ContextString);
 			return true;
 		}
+	}
+	return false;
+}
+
+bool AOmniGameModeBase::GetWeaponConfiguration(FName RowName, EWeaponType WeaponType, FOmniWeaponTable& WeaponConfig)
+{
+	if (WeaponConfigurationsDatabase != nullptr)
+	{
+		FString ContextString;
+		if (WeaponConfigurationsDatabase->FindRow<FOmniWeaponTable>(RowName, ContextString) != nullptr)
+		{
+			WeaponConfig = *WeaponConfigurationsDatabase->FindRow<FOmniWeaponTable>(RowName, ContextString);
+			return true;
+		}
+		const FName GenericConfiguration = WeaponType == EWeaponType::OneHandedWeapon ? FName("OneHanded") : FName("TwoHanded");
+		WeaponConfig = *WeaponConfigurationsDatabase->FindRow<FOmniWeaponTable>(GenericConfiguration, ContextString);
+		return true;
 	}
 	return false;
 }

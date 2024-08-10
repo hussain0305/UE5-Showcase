@@ -3,7 +3,9 @@
 #include "Character/OmniCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "HeaderFiles/OmniGlobal.h"
+#include "Game/OmniGameModeBase.h"
 
 AOmniWeapon::AOmniWeapon()
 {
@@ -90,7 +92,7 @@ void AOmniWeapon::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		BoxTraceResult,
 		true);
 }
-		
+
 void AOmniWeapon::SetItemState(const EItemState NewState)
 {
 	Super::SetItemState(NewState);
@@ -110,18 +112,53 @@ void AOmniWeapon::SetItemState(const EItemState NewState)
 
 int32 AOmniWeapon::GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState)
 {
-	switch (LocomotionState)
+	if(WeaponConfig.PrimaryAttackType == EAttackSelection::StateBased)
 	{
+		switch (LocomotionState)
+		{
 		case ECharacterLocomotionState::Stationary:
-			return StationaryAttackSectionNumber;
+			return WeaponConfig.RunningAttackSectionNumber;
 
 		case ECharacterLocomotionState::Falling:
-			return FalingAttackSectionNumber;
+			return WeaponConfig.FallingAttackSectionNumber;
 			
 		case ECharacterLocomotionState::Running:
-			return RunningAttackSectionNumber;
+			return WeaponConfig.RunningAttackSectionNumber;
 
 		default:
-			return FMath::RandRange(1,NumAttackOptions);;
+			return FMath::RandRange(1,WeaponConfig.NumSections);
+		}
+	}
+	return FMath::RandRange(1,WeaponConfig.NumSections);
+}
+
+FOmniWeaponTable AOmniWeapon::GetWeaponConfig()
+{
+	AssertWeaponConfig();
+	return WeaponConfig;
+}
+
+void AOmniWeapon::AssertWeaponConfig()
+{
+	if (WeaponConfigFetched)
+	{
+		return;
+	}
+	if (AOmniGameModeBase* GameMode = Cast<AOmniGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		if (GameMode->GetWeaponConfiguration(WeaponID, WeaponType, WeaponConfig))
+		{
+			PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Weapon Config FETCHED!!!"));
+			WeaponConfigFetched = true;
+		}
+		else
+		{
+			PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Weapon Config not found"));
+		}
+	}
+	else
+	{
+		PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Game Mode not found"));
 	}
 }
+

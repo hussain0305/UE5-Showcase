@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "HeaderFiles/OmniGlobal.h"
+#include "HeaderFiles/OmniWeaponTable.h"
 #include "OmniAnimInstance.generated.h"
 
 class AOmniCharacter;
@@ -19,15 +20,22 @@ public:
 //==============================
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-		AOmniCharacter* OmniCharacter;
+	AOmniCharacter* OmniCharacter;
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
-		class UCharacterMovementComponent* OmniCharacterMovement;
+	class UCharacterMovementComponent* OmniCharacterMovement;
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
-		float GroundSpeed;
+	float GroundSpeed;
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement")
-		float Direction;
+	float Direction;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Animation")
+	EAnimationBodyPart AnimatedBodyPart;
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Character State")
-		ECharacterWieldState CharacterWieldState;
+	ECharacterWieldState CharacterWieldState;
 
 //=========
 //Functions

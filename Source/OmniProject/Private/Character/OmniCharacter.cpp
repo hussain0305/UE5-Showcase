@@ -23,6 +23,8 @@
 #include "UI/OmniHUD.h"
 #include <string>
 
+#include "Character/OmniAnimInstance.h"
+
 AOmniCharacter::AOmniCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -338,6 +340,20 @@ void AOmniCharacter::SetCharacterWieldState(const TObjectPtr<AOmniWeapon> Curren
 	}
 }
 
+UOmniAnimInstance* AOmniCharacter::GetOmniAnimInstance()
+{
+	if (OmniAnimInstance != nullptr)
+	{
+		return OmniAnimInstance;
+	}
+	if (UAnimInstance* tAnimInstance = GetMesh()->GetAnimInstance())
+	{
+		OmniAnimInstance = Cast<UOmniAnimInstance>(tAnimInstance);
+		return OmniAnimInstance;
+	}
+	return nullptr;
+}
+
 //TODO: Make this Function better. Unsheathing should not require a reference to the weapon, just unsheath the currently equipped one
 void AOmniCharacter::PlayWeaponSheathAnimation(AOmniWeapon* WeaponToSheath)
 {
@@ -354,11 +370,13 @@ void AOmniCharacter::PlayWeaponSheathAnimation(AOmniWeapon* WeaponToSheath)
 		return;
 	}
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	UAnimMontage* SheathMontage = GetInventory()->GetWieldedWeapon()->SheathMontage;
-	if (AnimInstance && SheathMontage)
+	FOmniWeaponTable WeaponConfig = GetInventory()->GetWieldedWeapon()->GetWeaponConfig();
+	const FAnimationDetails SheathMontageDetails = WeaponConfig.SheathMontage;
+	UAnimMontage* SheathMontage = SheathMontageDetails.AnimationMontage;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SheathMontageDetails.BodyPart;
+	if (OmniAnimInstance && SheathMontage)
 	{
-		AnimInstance->Montage_Play(SheathMontage);
+		OmniAnimInstance->Montage_Play(SheathMontage);
 		SetCharacterActionState(ECharacterActionState::OtherAction);
 	}
 }
@@ -378,11 +396,13 @@ void AOmniCharacter::PlayWeaponUnsheathAnimation(AOmniWeapon* WeaponToUnsheath)
 		return;
 	}
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	UAnimMontage* UnsheathMontage = WeaponToUnsheath->UnsheathMontage;
-	if (AnimInstance && UnsheathMontage)
+	FOmniWeaponTable WeaponConfig = WeaponToUnsheath->GetWeaponConfig();
+	const FAnimationDetails UnsheathMontageDetails = WeaponConfig.UnsheathMontage;
+	UAnimMontage* UnsheathMontage = UnsheathMontageDetails.AnimationMontage;
+	GetOmniAnimInstance()->AnimatedBodyPart =  UnsheathMontageDetails.BodyPart;
+	if (OmniAnimInstance && UnsheathMontage)
 	{
-		AnimInstance->Montage_Play(UnsheathMontage);
+		OmniAnimInstance->Montage_Play(UnsheathMontage);
 		SetCharacterActionState(ECharacterActionState::OtherAction);
 	}
 }
@@ -426,22 +446,25 @@ void AOmniCharacter::StopAimInput()
 
 void AOmniCharacter::PrimaryAttackAction()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
 
 	if (WieldedWeapon == nullptr)
 	{
 		return;
 	}
-	
-	UAnimMontage* AttackMontage = WieldedWeapon->AttackMontage;
-	if (AnimInstance && AttackMontage)
+
+	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	const FAnimationDetails AttackMontageDetails = WeaponConfig.PrimaryAttack;
+	UAnimMontage* AttackMontage = AttackMontageDetails.AnimationMontage;
+	GetOmniAnimInstance()->AnimatedBodyPart =  AttackMontageDetails.BodyPart;
+
+	if (OmniAnimInstance && AttackMontage)
 	{
 		const int8 SectionToPlay = WieldedWeapon->GetMontageSectionToPlay(GetLocomotionState());
 		std::string SectionName = "Attack";
 		SectionName += std::to_string(SectionToPlay);
-		AnimInstance->Montage_Play(AttackMontage);
-		AnimInstance->Montage_JumpToSection(FName(SectionName.c_str()), AttackMontage);
+		OmniAnimInstance->Montage_Play(AttackMontage);
+		OmniAnimInstance->Montage_JumpToSection(FName(SectionName.c_str()), AttackMontage);
 		PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString(SectionName.c_str()));
 		SetCharacterActionState(ECharacterActionState::Attacking_PrimaryAction);
 	}
@@ -449,41 +472,60 @@ void AOmniCharacter::PrimaryAttackAction()
 
 void AOmniCharacter::StartAim()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
-	if (AnimInstance && SecondaryActionMontage)
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+	if (WieldedWeapon == nullptr)
+	{
+		return;
+	}
+	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	if (WeaponConfig.SecondaryAttackType != ESecondaryAttack::Aimed)
+	{
+		return;
+	}
+	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
+	
+	if (OmniAnimInstance && SecondaryActionMontage)
 	{
 		SecondaryActionMontage->bLoop = true;
-		AnimInstance->Montage_Play(SecondaryActionMontage);
-		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Aim, SecondaryActionMontage);
-		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
+		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_Aim, SecondaryActionMontage);
+		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
 		SetCharacterActionState(ECharacterActionState::AimStart_SecondaryAction);
 	}
 }
 
 void AOmniCharacter::AimStay()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
-	if (AnimInstance && SecondaryActionMontage)
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
+	
+	if (OmniAnimInstance && SecondaryActionMontage)
 	{
 		SecondaryActionMontage->bLoop = true;
-		AnimInstance->Montage_Play(SecondaryActionMontage);
-		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_AimStay, SecondaryActionMontage);
-		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
+		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_AimStay, SecondaryActionMontage);
+		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
 		SetCharacterActionState(ECharacterActionState::AimDone_SecondaryAction);
 	}
 }
 
 void AOmniCharacter::StopAim()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
-	if (AnimInstance && SecondaryActionMontage)
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
+	if (OmniAnimInstance && SecondaryActionMontage)
 	{
-		AnimInstance->Montage_Play(SecondaryActionMontage);
-		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Aim, SecondaryActionMontage);
-		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, -1);
+		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_Aim, SecondaryActionMontage);
+		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, -1);
 		SetCharacterActionState(ECharacterActionState::Idle);
 	}
 }
@@ -494,14 +536,17 @@ void AOmniCharacter::SecondaryAttackAction()
 	{
 		return;
 	}
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	UAnimMontage* SecondaryActionMontage = GetInventory()->GetWieldedWeapon()->SecondaryActionMontage;
-	if (AnimInstance && SecondaryActionMontage)
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
+	if (OmniAnimInstance && SecondaryActionMontage)
 	{
 		SecondaryActionMontage->bLoop = false;
-		AnimInstance->Montage_Play(SecondaryActionMontage);
-		AnimInstance->Montage_JumpToSection(GetInventory()->GetWieldedWeapon()->SecondaryActionMontage_Attack, SecondaryActionMontage);
-		AnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 5.f);
+		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_AimAttack, SecondaryActionMontage);
+		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 5.f);
 		SetCharacterActionState(ECharacterActionState::Attacking_SecondaryAction);
 	}
 }

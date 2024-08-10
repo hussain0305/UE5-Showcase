@@ -7,7 +7,6 @@
 #include "OmniGameModeBase.generated.h"
 
 
-
 UCLASS()
 class OMNIPROJECT_API AOmniGameModeBase : public AGameModeBase
 {
@@ -18,10 +17,16 @@ public:
 	AOmniGameModeBase();
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(VisibleAnywhere)
-		UDataTable* GameplayEffectsDatabase;
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* GameplayEffectsDatabase;
+
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* WeaponConfigurationsDatabase;
 
 	UFUNCTION(BlueprintCallable)
-		bool GetGameplayEffectDetails(FName RowName, FOmniGameplayEffectsDatabase& DatabaseRow);
+	bool GetGameplayEffectDetails(FName RowName, FOmniGameplayEffectsDatabase& DatabaseRow);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetWeaponConfiguration(FName RowName, EWeaponType WeaponType, FOmniWeaponTable& WeaponConfig);
 };
 
