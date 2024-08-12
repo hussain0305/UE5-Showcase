@@ -52,7 +52,8 @@ enum class EItemState : uint8
 {
 	Pickup				UMETA(DisplayName = "Pickup"),
 	Equipped			UMETA(DisplayName = "Equipped"),
-	Sheathed			UMETA(DisplayName = "Sheathed")
+	Sheathed			UMETA(DisplayName = "Sheathed"),
+	Thrown				UMETA(DisplayName = "Thrown")
 };
 
 UENUM(BlueprintType)

@@ -4,21 +4,25 @@
 #include "Weapons/OmniWeapon_Axe.h"
 
 #include "Character/OmniCharacter.h"
+#include "HeaderFiles/DebugMacros.h"
 #include "Weapons/OmniWeapon_ThrowingAxe.h"
 
 void AOmniWeapon_Axe::PerformSecondaryAction(TObjectPtr<AOmniCharacter> OwningCharacter)
 {
 	Super::PerformSecondaryAction(OwningCharacter);
 
-	FVector Origin, Target;
-	// USkeletalMeshComponent* MeshComponent = GetOwner()->FindComponentByClass<USkeletalMeshComponent>();
-	// if (MeshComponent)
-	// {
-	// 	Origin = MeshComponent->GetSocketLocation("SingleHandedWeapon");
-	// }
+	FVector Origin, Target, HitNormal;
 	Origin = GetActorLocation();
 
 	APlayerController* PlayerController = Cast<APlayerController>(OwningCharacter->GetController());
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(GetOwner());
+	CollisionParams.AddIgnoredActor(this);
+	CollisionParams.AddIgnoredActor(OwningCharacter);
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(OwningCharacter);
+	IgnoredActors.Add(this);
+	
 	if (PlayerController)
 	{
 		FVector CameraLocation;
@@ -29,19 +33,20 @@ void AOmniWeapon_Axe::PerformSecondaryAction(TObjectPtr<AOmniCharacter> OwningCh
 		FVector MaxDistancePoint = Origin + (CameraForwardVector * ThrowRange);
 
 		FHitResult HitResult;
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(GetOwner());
-		CollisionParams.AddIgnoredActor(OwningCharacter);
-		
+
 		if (bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Origin, MaxDistancePoint, ECC_Visibility, CollisionParams))
 		{
-			Target = HitResult.Location;
+			if (AActor* HitActor = HitResult.GetActor())
+			{
+				PRINT_DEBUG_MESSAGE_WITH_PARAMETER(5.f, FColor::Emerald, FString("Hit object: "), *HitActor->GetName());
+			}
+			Target = HitResult.ImpactPoint;
+			HitNormal = HitResult.ImpactNormal;
 		}
 		else
 		{
 			Target = MaxDistancePoint;
 		}
-		Target = MaxDistancePoint;
 	}
 	else
 	{
@@ -60,7 +65,8 @@ void AOmniWeapon_Axe::PerformSecondaryAction(TObjectPtr<AOmniCharacter> OwningCh
 		if (AActor* SpawnedActor = World->SpawnActor<AActor>(ThrowingAxe, SpawnLocation, SpawnRotation, SpawnParams))
 		{
 			AOmniWeapon_ThrowingAxe* ThrownAxe = Cast<AOmniWeapon_ThrowingAxe>(SpawnedActor);
-			ThrownAxe->StartThrowTrajectory(Origin, Target);
+			ThrownAxe->StartThrowTrajectory(Origin, Target, HitNormal, IgnoredActors);
+			ThrownAxe->SetItemState(EItemState::Thrown);
 		}
 	}
 }

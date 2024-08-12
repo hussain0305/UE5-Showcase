@@ -155,14 +155,6 @@ void AOmniWeapon::AssertWeaponConfig()
 			PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Weapon Config FETCHED!!!"));
 			WeaponConfigFetched = true;
 		}
-		else
-		{
-			PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Weapon Config not found"));
-		}
-	}
-	else
-	{
-		PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Game Mode not found"));
 	}
 }
 

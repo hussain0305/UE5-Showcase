@@ -18,7 +18,7 @@ class OMNIPROJECT_API AOmniWeapon_Axe : public AOmniWeapon
 public:
 
 	UPROPERTY(EditDefaultsOnly)
-	float ThrowRange = 2500;
+	float ThrowRange = 10000;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AOmniWeapon_ThrowingAxe> ThrowingAxe;
