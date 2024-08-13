@@ -70,42 +70,54 @@ bool AOmniWeapon_ThrowingAxe::CheckForCollision()
 	FVector CurrentLocation = GetActorLocation();
 	float CollisionRadius = 10.0f;
 
-	// Define the object types to overlap with
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Destructible));
 
-	// Perform the sphere overlap
-	TArray<AActor*> OverlappedActors;
-	if (UKismetSystemLibrary::SphereOverlapActors(
+	TArray<FHitResult> HitResults;
+	if (UKismetSystemLibrary::SphereTraceMulti(
 			GetWorld(),
 			CurrentLocation,
+			CurrentLocation,
 			CollisionRadius,
-			ObjectTypes,
-			nullptr,
+			UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel3),
+			false,
 			IgnoredActors,
-			OverlappedActors))
+			EDrawDebugTrace::ForDuration,
+			HitResults,
+			true
+		))
 	{
 		DRAW_SPHERE_RADIUS(CurrentLocation, CollisionRadius);
-
-		if (OverlappedActors.Num() > 0)
+		for (const FHitResult& HitResult : HitResults)
 		{
-			AActor* HitActor = OverlappedActors[0];
-
-			FHitResult HitResult;
-			FVector EndLocation = HitActor->GetActorLocation();
-			if (GetWorld()->LineTraceSingleByChannel(HitResult, CurrentLocation, EndLocation, ECC_Visibility))
+			if (HitResult.GetActor())
 			{
-				SetActorLocation(HitResult.ImpactPoint);
-				SetActorRotation(CalculateLodgedRotation(HitResult.ImpactNormal));
-				return true;
+				AActor* HitActor = HitResult.GetActor();
+				UPrimitiveComponent* HitComponent = HitResult.GetComponent();
+				if (HitComponent && HitComponent->GetCollisionObjectType() == ECC_Destructible)
+				{
+					//TODO: If it's destructible, destroy it but do not stop the axe
+					PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Hit Destructible"));
+				}
+				else if (HitComponent && (HitComponent->GetCollisionObjectType() == ECC_WorldStatic ||
+					HitComponent->GetCollisionObjectType() == ECC_WorldDynamic))
+				{
+					SetActorLocation(HitResult.ImpactPoint);
+					SetActorRotation(CalculateLodgedRotation(HitResult.ImpactNormal));
+					return true;
+				}
+				else if (HitComponent && HitComponent->GetCollisionObjectType() == ECC_GameTraceChannel1)
+				{
+					PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Hit Character"));
+				}
 			}
 		}
 	}
 
-	return false;}
+	return false;
+}
 
 FRotator AOmniWeapon_ThrowingAxe::CalculateLodgedRotation(const FVector& tHitNormal) const
 {
