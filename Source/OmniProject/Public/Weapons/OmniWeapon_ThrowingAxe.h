@@ -32,7 +32,7 @@ public:
 	float RotationSpeed = -1800.0f;
 
 	UPROPERTY(EditDefaultsOnly)
-	FVector Gravity = FVector(0, 0, -490.0f);
+	FVector Gravity = FVector(0, 0, -245.0f);
 
 private:
 

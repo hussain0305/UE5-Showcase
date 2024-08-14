@@ -84,7 +84,7 @@ bool AOmniWeapon_ThrowingAxe::CheckForCollision()
 			UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel3),
 			false,
 			IgnoredActors,
-			EDrawDebugTrace::ForDuration,
+			EDrawDebugTrace::None,
 			HitResults,
 			true
 		))
