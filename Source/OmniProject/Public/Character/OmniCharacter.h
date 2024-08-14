@@ -4,10 +4,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "HeaderFiles/OmniGlobal.h"
-#include "Interfaces/Damageable.h"
 #include "Player/OmniInventory.h"
 #include "Weapons/OmniWeapon.h"
 #include "OmniCharacter.generated.h"
@@ -25,6 +22,8 @@ class UInputAction;
 class UOmniInventory;
 class AOmniItem;
 class AOmniWeapon;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FIsAiming, bool, bIsAiming);
 
 UCLASS()
 class OMNIPROJECT_API AOmniCharacter : public ACharacter, public IAbilitySystemInterface//, public IDamageable
@@ -44,6 +43,9 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
+	UPROPERTY(BlueprintAssignable, Category = "HUD Delegate")
+	FIsAiming OnIsAimingChanged;
+	
 //======
 //Consts
 //======

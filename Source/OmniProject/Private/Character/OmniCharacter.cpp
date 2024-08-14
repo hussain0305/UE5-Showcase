@@ -438,6 +438,7 @@ void AOmniCharacter::AimInput()
 void AOmniCharacter::StopAimInput()
 {
 	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Released"));
+	OnIsAimingChanged.Broadcast(false);
 	if(GetIsAiming())
 	{
 		StopAim();
@@ -488,6 +489,7 @@ void AOmniCharacter::StartAim()
 	
 	if (OmniAnimInstance && SecondaryActionMontage)
 	{
+		OnIsAimingChanged.Broadcast(true);
 		SecondaryActionMontage->bLoop = true;
 		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
 		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_Aim, SecondaryActionMontage);
@@ -524,6 +526,7 @@ void AOmniCharacter::PerformSecondaryWeaponAction()
 
 void AOmniCharacter::StopAim()
 {
+	OnIsAimingChanged.Broadcast(false);
 	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
 	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
 	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;

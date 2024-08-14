@@ -7,6 +7,7 @@
 #include "HeaderFiles/OmniPlayerDetails.h"
 #include "OmniHUD.generated.h"
 
+class AOmniCharacter;
 class UOmniHUDController;
 class UOmniUserWidget;
 
@@ -20,23 +21,34 @@ class OMNIPROJECT_API AOmniHUD : public AHUD
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blueprints")
-		TSubclassOf<UOmniUserWidget> BP_HUDOverlay;
+	TSubclassOf<UOmniUserWidget> BP_HUDOverlay;
 
 	UPROPERTY(BlueprintReadOnly)
-		TObjectPtr<UOmniUserWidget> HUDOverlayWidget;
-	
-	UFUNCTION()
-		void InitializeHUD(FOmniWidgetControllerParams& PlayerDetails);
-
-	UFUNCTION(BlueprintCallable)
-		UOmniHUDController* GetHUDController() const;
+	TObjectPtr<UOmniUserWidget> HUDOverlayWidget;
 
 	UPROPERTY(BlueprintAssignable, Category = "Controller Assigned Delegate")
-		FControllerAssignedSignature OnControllerAssigned;
+	FControllerAssignedSignature OnControllerAssigned;
+
+	UFUNCTION()
+	void InitializeHUD(FOmniWidgetControllerParams& PlayerDetailsParam);
+
+	UFUNCTION(BlueprintCallable)
+	UOmniHUDController* GetHUDController() const;
+
+	UFUNCTION()
+	void ToggleReticle(bool ReticleEnabled);
 	
 protected:
+	FOmniWidgetControllerParams PlayerDetails;
 	
 	UPROPERTY(BlueprintReadOnly)
-		TObjectPtr<UOmniHUDController> HUDController;
+	TObjectPtr<UOmniHUDController> HUDController;
 
+	TObjectPtr<AOmniCharacter> PlayerCharacter;
+
+	UFUNCTION()
+	void TrySetupCharacter();
+
+	UFUNCTION()
+	void SetupCharacter(AOmniCharacter* PlayerCharacterParam);
 };
