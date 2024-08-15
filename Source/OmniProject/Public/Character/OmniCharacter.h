@@ -9,6 +9,7 @@
 #include "Weapons/OmniWeapon.h"
 #include "OmniCharacter.generated.h"
 
+class UOmniCameraManager;
 class UOmniAnimInstance;
 class UOmniAttributeSet;
 class UOmniAbilitySystemComponent;
@@ -62,39 +63,51 @@ public:
 	// Camera
 	//--------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
-		USpringArmComponent* CameraBoom;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
-		UCameraComponent* Camera;
+	USpringArmComponent* CameraBoom;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Core Component")
+	UCameraComponent* Camera;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character Core Component")
+	TObjectPtr<UOmniCameraManager> CameraManager;
+	
 	//-------
 	// Input
 	//-------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputMappingContext* MappingContext;
+	UInputMappingContext* MappingContext;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_Move;
+	UInputAction* InputAction_Move;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_Look;
+	UInputAction* InputAction_Look;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_Jump;
+	UInputAction* InputAction_Jump;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_Equip;
+	UInputAction* InputAction_Equip;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_OneHandedToggleSheath;
+	UInputAction* InputAction_OneHandedToggleSheath;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_TwoHandedToggleSheath;
+	UInputAction* InputAction_TwoHandedToggleSheath;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_Attack_PrimaryAction;
+	UInputAction* InputAction_Attack_PrimaryAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-		UInputAction* InputAction_Attack_SecondaryAction;
+	UInputAction* InputAction_Attack_SecondaryAction;
 
 	//----------------
 	// Ability System
 	//----------------
 	UPROPERTY()
-		TObjectPtr<UOmniAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UOmniAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
-		TObjectPtr<UOmniAttributeSet> AttributeSet;
+	TObjectPtr<UOmniAttributeSet> AttributeSet;
 	
 //==================================
 //Setters, Getters, Inline Functions
@@ -104,9 +117,9 @@ public:
 	// Wielding Helpers - Weapon currently being wielded by the character, NOT being carried
 	//--------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintPure)
-		bool BP_GetCharacterIsWieldingWeapon() const { return GetCharacterIsWieldingWeapon();}
+	bool BP_GetCharacterIsWieldingWeapon() const { return GetCharacterIsWieldingWeapon();}
 	UFUNCTION(BlueprintPure)
-		AOmniWeapon* BP_GetWieldedWeapon() const { return GetInventory()->GetWieldedWeapon();}
+	AOmniWeapon* BP_GetWieldedWeapon() const { return GetInventory()->GetWieldedWeapon();}
 
 	void SetCharacterWieldState(const TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon);
 	FORCEINLINE ECharacterWieldState GetCharacterWieldState() const { return CharacterWieldState;}
@@ -154,45 +167,56 @@ public:
 	// Overlapping Weapons and Pickups
 	//--------------------------------
 	UFUNCTION()
-		void SetOverlappingItemBegin(AOmniItem* OverlappedItem);
+	void SetOverlappingItemBegin(AOmniItem* OverlappedItem);
+
 	UFUNCTION()
-		void SetOverlappingItemEnd(AOmniItem* OverlappedItem);
+	void SetOverlappingItemEnd(AOmniItem* OverlappedItem);
+
 	UFUNCTION()
-		void SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon);
+	void SetOverlappingWeaponBegin(AOmniWeapon* OverlappedWeapon);
+
 	UFUNCTION()
-		void SetOverlappingWeaponEnd(const AOmniWeapon* OverlappedWeapon);
+	void SetOverlappingWeaponEnd(const AOmniWeapon* OverlappedWeapon);
 
 	//---------------
 	// Weapon Actions
 	//---------------
 	UFUNCTION(BlueprintCallable)
-		void AttackEnded();
+	void AttackEnded();
+
 	UFUNCTION()
-		void PlayWeaponSheathAnimation(AOmniWeapon* WeaponToSheath);
+	void PlayWeaponSheathAnimation(AOmniWeapon* WeaponToSheath);
+
 	UFUNCTION(BlueprintCallable)
-		void SheathWeapon();
+	void SheathWeapon();
+
 	UFUNCTION()
-		void PlayWeaponUnsheathAnimation(AOmniWeapon* WeaponToUnsheath);
+	void PlayWeaponUnsheathAnimation(AOmniWeapon* WeaponToUnsheath);
+
 	UFUNCTION(BlueprintCallable)
-		void EquipWeapon(AOmniWeapon* WeaponToEquip);
+	void EquipWeapon(AOmniWeapon* WeaponToEquip);
+
 	UFUNCTION(BlueprintCallable)
-		void EquipWeaponOfTypeFromInventory(EWeaponType WeaponType);
+	void EquipWeaponOfTypeFromInventory(EWeaponType WeaponType);
+
 	UFUNCTION()
-		void DropWeapon(AOmniWeapon* WeaponToDrop);
+	void DropWeapon(AOmniWeapon* WeaponToDrop);
+
 	UFUNCTION()
-		void AimStay();
+	void AimStay();
+
 	UFUNCTION()
-		void PerformSecondaryWeaponAction();
+	void PerformSecondaryWeaponAction();
 
 	//-------
 	// Others
 	//-------
 
 	UFUNCTION(BlueprintCallable)
-		UOmniAnimInstance* GetOmniAnimInstance();
+	UOmniAnimInstance* GetOmniAnimInstance();
 
 	UFUNCTION(BlueprintCallable)
-		ECharacterLocomotionState GetLocomotionState();
+	ECharacterLocomotionState GetLocomotionState();
 protected:
 
 	virtual void BeginPlay() override;
@@ -202,28 +226,39 @@ protected:
 	//-------------------------
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+
 	UFUNCTION()
-		void HandleWeapon();
+	void HandleWeapon();
+
 	UFUNCTION()
-		void OneHandedWeaponToggleSheath();
+	void OneHandedWeaponToggleSheath();
+
 	UFUNCTION()
-		void TwoHandedWeaponToggleSheath();
+	void TwoHandedWeaponToggleSheath();
+
 	UFUNCTION()
-		void ToggleSheath(EWeaponType WeaponType);
+	void ToggleSheath(EWeaponType WeaponType);
+
 	UFUNCTION()
-		void PrimaryAttackInput();
+	void PrimaryAttackInput();
+
 	UFUNCTION()
-		void PrimaryAttackAction();
+	void PrimaryAttackAction();
+
 	UFUNCTION()
-		void AimInput();
+	void AimInput();
+
 	UFUNCTION()
-		void StopAimInput();
+	void StopAimInput();
+
 	UFUNCTION()
-		void StartAim();
+	void StartAim();
+
 	UFUNCTION()
-		void StopAim();
+	void StopAim();
+
 	UFUNCTION()
-		void SecondaryAttackAction();
+	void SecondaryAttackAction();
 
 	//-------------
 	// Initializers
@@ -237,17 +272,22 @@ private:
 //======================================
 
 	UPROPERTY(VisibleAnywhere)
-		AOmniItem* OverlappingItem = nullptr;
+	AOmniItem* OverlappingItem = nullptr;
+
 	UPROPERTY(VisibleAnywhere)
-		AOmniWeapon* OverlappingWeapon = nullptr;
+	AOmniWeapon* OverlappingWeapon = nullptr;
+
 	UPROPERTY(VisibleAnywhere)
-		ECharacterWieldState CharacterWieldState = ECharacterWieldState::Unequipped;
+	ECharacterWieldState CharacterWieldState = ECharacterWieldState::Unequipped;
+
 	UPROPERTY(VisibleAnywhere)
-		ECharacterActionState CharacterActionState = ECharacterActionState::Idle;
+	ECharacterActionState CharacterActionState = ECharacterActionState::Idle;
+
 	UPROPERTY(VisibleAnywhere)
-		TObjectPtr<UOmniInventory> Inventory;
+	TObjectPtr<UOmniInventory> Inventory;
+
 	UPROPERTY(VisibleAnywhere)
-		TObjectPtr<UOmniAnimInstance> OmniAnimInstance;
+	TObjectPtr<UOmniAnimInstance> OmniAnimInstance;
 
 //=================
 //Private Functions

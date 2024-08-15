@@ -22,7 +22,7 @@
 #include "Player/OmniPlayerState.h"
 #include "UI/OmniHUD.h"
 #include <string>
-
+#include "Camera/OmniCameraManager.h"
 #include "Character/OmniAnimInstance.h"
 
 AOmniCharacter::AOmniCharacter()
@@ -43,6 +43,9 @@ AOmniCharacter::AOmniCharacter()
 	Camera->SetupAttachment(CameraBoom);
 	Camera->bUsePawnControlRotation = true;
 
+	CameraManager = CreateDefaultSubobject<UOmniCameraManager>(FName("Camera Manager"));
+	CameraManager->SetupCameraManager(Camera, this);
+	
 	//Controller
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
