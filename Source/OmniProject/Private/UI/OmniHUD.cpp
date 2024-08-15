@@ -8,14 +8,20 @@
 #include "Player/OmniController.h"
 #include "UI/OmniHUDController.h"
 #include "UI/OmniUserWidget.h"
+#include "UI/Widgets/WidgetReticle.h"
 
 void AOmniHUD::InitializeHUD(FOmniWidgetControllerParams& PlayerDetailsParam)
 {
 	PlayerDetails = PlayerDetailsParam;
+	
 	UUserWidget* OverlayWidget = CreateWidget<UUserWidget>(GetWorld(), BP_HUDOverlay);
 	HUDOverlayWidget = Cast<UOmniUserWidget>(OverlayWidget);
 	HUDOverlayWidget->AddToViewport();
 
+	ReticleWidget = CreateWidget<UWidgetReticle>(GetWorld(), WBP_Reticle);
+	ReticleWidget->AddToViewport();
+	ToggleReticle(false);
+	
 	HUDController = NewObject<UOmniHUDController>(this, UOmniHUDController::StaticClass());
 	HUDController->InitController(PlayerDetailsParam);
 
@@ -31,6 +37,7 @@ UOmniHUDController* AOmniHUD::GetHUDController() const
 
 void AOmniHUD::ToggleReticle(bool ReticleEnabled)
 {
+	ReticleWidget->SetReticleEnabled(ReticleEnabled);
 	if (ReticleEnabled)
 	{
 		PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Reticle Enabled"));

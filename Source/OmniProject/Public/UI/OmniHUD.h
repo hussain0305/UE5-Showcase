@@ -10,6 +10,7 @@
 class AOmniCharacter;
 class UOmniHUDController;
 class UOmniUserWidget;
+class UWidgetReticle;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FControllerAssignedSignature, UOmniHUDController*, Controller);
 
@@ -25,6 +26,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UOmniUserWidget> HUDOverlayWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blueprints")
+	TSubclassOf<UWidgetReticle> WBP_Reticle;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UWidgetReticle> ReticleWidget;
 
 	UPROPERTY(BlueprintAssignable, Category = "Controller Assigned Delegate")
 	FControllerAssignedSignature OnControllerAssigned;
