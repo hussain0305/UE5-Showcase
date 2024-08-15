@@ -12,9 +12,9 @@ void AOmniWeapon_Axe::PerformSecondaryAction(TObjectPtr<AOmniCharacter> OwningCh
 	Super::PerformSecondaryAction(OwningCharacter);
 
 	FVector Origin, Target, HitNormal;
-	Origin = GetActorLocation();
 
 	APlayerController* PlayerController = Cast<APlayerController>(OwningCharacter->GetController());
+	Origin = PlayerController->PlayerCameraManager->GetCameraLocation();
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());
 	CollisionParams.AddIgnoredActor(this);
