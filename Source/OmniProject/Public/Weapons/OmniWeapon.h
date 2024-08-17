@@ -53,6 +53,15 @@ public:
 //Functions
 //=========
 
+	//---------------
+	// Action Helpers
+	//---------------
+	FORCEINLINE void SetIsWeaponAttacking(const bool Attacking) { bIsAttacking = Attacking;}
+	FORCEINLINE bool GetIsWeaponAttacking() const {return bIsAttacking;}
+
+	//-------
+	// Others
+	//-------
 	virtual void SetItemState(const EItemState NewState) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -61,7 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FOmniWeaponTable GetWeaponConfig();
 
-	virtual void PerformSecondaryAction(TObjectPtr<class AOmniCharacter> OwningCharacter);
+	virtual void Secondary_PreAttack(TObjectPtr<class AOmniCharacter> OwningCharacter);
+	virtual void Secondary_DoAttack(TObjectPtr<class AOmniCharacter> OwningCharacter);
+	virtual void Secondary_PostAttack(TObjectPtr<class AOmniCharacter> OwningCharacter);
 
 protected:
 
@@ -82,4 +93,5 @@ private:
 
 	FOmniWeaponTable WeaponConfig;
 	bool WeaponConfigFetched = false;
+	bool bIsAttacking = false;
 };

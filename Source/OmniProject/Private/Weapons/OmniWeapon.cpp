@@ -138,7 +138,15 @@ FOmniWeaponTable AOmniWeapon::GetWeaponConfig()
 	return WeaponConfig;
 }
 
-void AOmniWeapon::PerformSecondaryAction(TObjectPtr<AOmniCharacter> OwningCharacter)
+void AOmniWeapon::Secondary_PreAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
+{
+}
+
+void AOmniWeapon::Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
+{
+}
+
+void AOmniWeapon::Secondary_PostAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
 {
 }
 

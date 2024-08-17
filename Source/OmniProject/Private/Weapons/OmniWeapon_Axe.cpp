@@ -7,12 +7,19 @@
 #include "HeaderFiles/DebugMacros.h"
 #include "Weapons/OmniWeapon_ThrowingAxe.h"
 
-void AOmniWeapon_Axe::PerformSecondaryAction(TObjectPtr<AOmniCharacter> OwningCharacter)
+void AOmniWeapon_Axe::Secondary_PreAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
 {
-	Super::PerformSecondaryAction(OwningCharacter);
+	Super::Secondary_PreAttack(OwningCharacter);
+	
+	OwningCharacter->SetCharacterActionState(ECharacterActionState::AimStart_SecondaryAction);
+	OwningCharacter->SetWantsAim(true);
+}
+
+void AOmniWeapon_Axe::Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
+{
+	Super::Secondary_DoAttack(OwningCharacter);
 
 	FVector Origin, Target, HitNormal;
-
 	APlayerController* PlayerController = Cast<APlayerController>(OwningCharacter->GetController());
 	Origin = PlayerController->PlayerCameraManager->GetCameraLocation();
 	FCollisionQueryParams CollisionParams;

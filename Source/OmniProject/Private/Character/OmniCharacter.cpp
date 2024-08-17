@@ -99,6 +99,15 @@ void AOmniCharacter::InitHUD() const
 	}
 }
 
+void AOmniCharacter::SetWantsAim(const bool NewValue)
+{
+	if (bWantsAim != NewValue)
+	{
+		bWantsAim = NewValue;
+		OnIsAimingChanged.Broadcast(bWantsAim);
+	}
+}
+
 UAbilitySystemComponent* AOmniCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -136,8 +145,8 @@ void AOmniCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(InputAction_OneHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::OneHandedWeaponToggleSheath);
 		EnhancedInputComponent->BindAction(InputAction_TwoHandedToggleSheath, ETriggerEvent::Triggered, this, &AOmniCharacter::TwoHandedWeaponToggleSheath);
 		EnhancedInputComponent->BindAction(InputAction_Attack_PrimaryAction, ETriggerEvent::Triggered, this, &AOmniCharacter::PrimaryAttackInput);
-		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Started, this, &AOmniCharacter::AimInput);
-		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Completed, this, &AOmniCharacter::StopAimInput);
+		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Started, this, &AOmniCharacter::SecondaryAttackInput_Start);
+		EnhancedInputComponent->BindAction(InputAction_Attack_SecondaryAction, ETriggerEvent::Completed, this, &AOmniCharacter::SecondaryAttackInput_Stop);
 	}
 }
 
@@ -418,37 +427,94 @@ void AOmniCharacter::PrimaryAttackInput()
 	}
 	if (GetCanPerformPrimaryWeaponAction())
 	{
-		PrimaryAttackAction();
+		PrimaryAttackAnimation();
 	}
 	else if(GetCanPerformSecondaryWeaponAction())
 	{
-		SecondaryAttackAction();
+		SecondaryAttackAnimation();
 	}
 }
 
-void AOmniCharacter::AimInput()
+void AOmniCharacter::SecondaryAttackInput_Start()
 {
 	if (!GetCharacterIsWieldingWeapon())
 	{
 		return;
 	}
-	if (GetCanAim())
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+	if (WieldedWeapon == nullptr)
 	{
-		StartAim();
+		return;
+	}
+	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	if (WeaponConfig.SecondaryAttackType == ESecondaryAttack::NotApplicable)
+	{
+		return;
+	}
+	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
+
+	//If the secondary attack is just a regular attack, montage phase 1 is the attack, and this works
+	//If the secondary attack is an aimed attack, this still works as the phase 1 is the aim start montage. Callback in the animation montage progresses it to phase 2
+	if (OmniAnimInstance && SecondaryActionMontage)
+	{
+		SetCharacterActionState(ECharacterActionState::Attacking_SecondaryAction);
+		//This function does whatever weapon-specific things there might be to do
+		WieldedWeapon->Secondary_PreAttack(this);
+		SecondaryActionMontage->bLoop = false;
+		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.SecondaryAttackMontageSectionName_Phase1, SecondaryActionMontage);
+		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
 	}
 }
 
-void AOmniCharacter::StopAimInput()
+void AOmniCharacter::SecondaryAttackInput_Stop()
 {
 	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Released"));
-	OnIsAimingChanged.Broadcast(false);
+	SetWantsAim(false);
 	if(GetIsAiming())
 	{
 		StopAim();
 	}
 }
 
-void AOmniCharacter::PrimaryAttackAction()
+void AOmniCharacter::AimStay()
+{
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+	const FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
+	
+	if (OmniAnimInstance && SecondaryActionMontage)
+	{
+		SecondaryActionMontage->bLoop = true;
+		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.SecondaryAttackMontageSectionName_Phase2, SecondaryActionMontage);
+		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
+		SetCharacterActionState(ECharacterActionState::AimStay_SecondaryAction);
+	}
+}
+
+void AOmniCharacter::StopAim()
+{
+	SetWantsAim(false);
+	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
+	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
+	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
+	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
+	if (OmniAnimInstance && SecondaryActionMontage)
+	{
+		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.SecondaryAttackMontageSectionName_Phase1, SecondaryActionMontage);
+		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, -1);
+		SetCharacterActionState(ECharacterActionState::Idle);
+	}
+}
+
+void AOmniCharacter::PrimaryAttackAnimation()
 {
 	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
 
@@ -469,82 +535,11 @@ void AOmniCharacter::PrimaryAttackAction()
 		SectionName += std::to_string(SectionToPlay);
 		OmniAnimInstance->Montage_Play(AttackMontage);
 		OmniAnimInstance->Montage_JumpToSection(FName(SectionName.c_str()), AttackMontage);
-		PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString(SectionName.c_str()));
 		SetCharacterActionState(ECharacterActionState::Attacking_PrimaryAction);
 	}
 }
 
-void AOmniCharacter::StartAim()
-{
-	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
-	if (WieldedWeapon == nullptr)
-	{
-		return;
-	}
-	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
-	if (WeaponConfig.SecondaryAttackType != ESecondaryAttack::Aimed)
-	{
-		return;
-	}
-	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
-	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
-	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
-	
-	if (OmniAnimInstance && SecondaryActionMontage)
-	{
-		OnIsAimingChanged.Broadcast(true);
-		SecondaryActionMontage->bLoop = true;
-		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
-		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_Aim, SecondaryActionMontage);
-		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
-		SetCharacterActionState(ECharacterActionState::AimStart_SecondaryAction);
-	}
-}
-
-void AOmniCharacter::AimStay()
-{
-	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
-	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
-	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
-	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
-	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
-	
-	if (OmniAnimInstance && SecondaryActionMontage)
-	{
-		SecondaryActionMontage->bLoop = true;
-		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
-		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_AimStay, SecondaryActionMontage);
-		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
-		SetCharacterActionState(ECharacterActionState::AimDone_SecondaryAction);
-	}
-}
-
-void AOmniCharacter::PerformSecondaryWeaponAction()
-{
-	if (GetInventory()->GetWieldedWeapon())
-	{
-		GetInventory()->GetWieldedWeapon()->PerformSecondaryAction(this);
-	}
-}
-
-void AOmniCharacter::StopAim()
-{
-	OnIsAimingChanged.Broadcast(false);
-	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
-	FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
-	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;
-	GetOmniAnimInstance()->AnimatedBodyPart =  SecondaryAttackMontageDetails.BodyPart;
-	UAnimMontage* SecondaryActionMontage = SecondaryAttackMontageDetails.AnimationMontage;
-	if (OmniAnimInstance && SecondaryActionMontage)
-	{
-		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
-		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_Aim, SecondaryActionMontage);
-		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, -1);
-		SetCharacterActionState(ECharacterActionState::Idle);
-	}
-}
-
-void AOmniCharacter::SecondaryAttackAction()
+void AOmniCharacter::SecondaryAttackAnimation()
 {
 	if (!GetIsAiming())
 	{
@@ -559,9 +554,22 @@ void AOmniCharacter::SecondaryAttackAction()
 	{
 		SecondaryActionMontage->bLoop = false;
 		OmniAnimInstance->Montage_Play(SecondaryActionMontage);
-		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.MontageSectionName_AimAttack, SecondaryActionMontage);
+		OmniAnimInstance->Montage_JumpToSection(WeaponConfig.SecondaryAttackMontageSectionName_Phase3, SecondaryActionMontage);
 		OmniAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 5.f);
 		SetCharacterActionState(ECharacterActionState::Attacking_SecondaryAction);
+	}
+}
+
+void AOmniCharacter::PrimaryAttackNotification()
+{
+	//TODO: Implement in weapon class to enable hitboxes.
+}
+
+void AOmniCharacter::SecondaryAttackNotification()
+{
+	if (GetInventory()->GetWieldedWeapon())
+	{
+		GetInventory()->GetWieldedWeapon()->Secondary_DoAttack(this);
 	}
 }
 

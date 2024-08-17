@@ -41,8 +41,8 @@ enum class ECharacterActionState : uint8
 {
 	Idle						UMETA(DisplayName = "Idle"),
 	Attacking_PrimaryAction		UMETA(DisplayName = "Attacking - Primary Action"),
-	AimStart_SecondaryAction		UMETA(DisplayName = "Aiming Started - Secondary Action"),
-	AimDone_SecondaryAction		UMETA(DisplayName = "Aiming Completed - Secondary Action"),
+	AimStart_SecondaryAction	UMETA(DisplayName = "Aiming Started - Secondary Action"),
+	AimStay_SecondaryAction		UMETA(DisplayName = "Aiming Stay - Secondary Action"),
 	Attacking_SecondaryAction	UMETA(DisplayName = "Attacking - Secondary Action"),
 	OtherAction					UMETA(DisplayName = "OtherAction")
 };

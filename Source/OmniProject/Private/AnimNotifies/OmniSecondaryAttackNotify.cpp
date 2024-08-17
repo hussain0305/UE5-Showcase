@@ -14,7 +14,7 @@ void UOmniSecondaryAttackNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 	{
 		if (AOmniCharacter* OmniCharacter = Cast<AOmniCharacter>(Owner))
 		{
-			OmniCharacter->PerformSecondaryWeaponAction();
+			OmniCharacter->SecondaryAttackNotification();
 		}
 	}
 }

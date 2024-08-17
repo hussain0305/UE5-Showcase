@@ -84,11 +84,11 @@ struct FOmniWeaponTable : public FTableRowBase
 	FAnimationDetails SecondaryAttack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack", meta = (EditCondition = "SecondaryAttackType == ESecondaryAttack::Aimed", EditConditionHides))
-	FName MontageSectionName_Aim;
+	FName SecondaryAttackMontageSectionName_Phase1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack", meta = (EditCondition = "SecondaryAttackType == ESecondaryAttack::Aimed", EditConditionHides))
-	FName MontageSectionName_AimStay;
+	FName SecondaryAttackMontageSectionName_Phase2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack", meta = (EditCondition = "SecondaryAttackType == ESecondaryAttack::Aimed", EditConditionHides))
-	FName MontageSectionName_AimAttack;
+	FName SecondaryAttackMontageSectionName_Phase3;
 };

@@ -22,6 +22,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AOmniWeapon_ThrowingAxe> ThrowingAxe;
+
+	virtual void Secondary_PreAttack(TObjectPtr<AOmniCharacter> OwningCharacter) override;
 	
-	virtual void PerformSecondaryAction(TObjectPtr<AOmniCharacter> OwningCharacter) override;
+	virtual void Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharacter) override;
 };

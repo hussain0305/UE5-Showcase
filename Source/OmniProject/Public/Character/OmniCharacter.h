@@ -137,12 +137,12 @@ public:
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
 	FORCEINLINE bool GetCanPerformPrimaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped && !GetIsInSecondaryAttackLoop();}
 	FORCEINLINE bool GetCanAim() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
-	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::AimDone_SecondaryAction;}
+	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::AimStay_SecondaryAction;}
 	FORCEINLINE bool GetStartedAiming() const { return CharacterActionState == ECharacterActionState::AimStart_SecondaryAction;}
-	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::AimDone_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::AimStay_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanSheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanUnsheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle;}
-	FORCEINLINE bool GetIsInSecondaryAttackLoop() const { return CharacterActionState == ECharacterActionState::AimStart_SecondaryAction || CharacterActionState == ECharacterActionState::AimDone_SecondaryAction;}
+	FORCEINLINE bool GetIsInSecondaryAttackLoop() const { return CharacterActionState == ECharacterActionState::AimStart_SecondaryAction || CharacterActionState == ECharacterActionState::AimStay_SecondaryAction;}
 	
 	//---------------
 	// Ability System
@@ -182,6 +182,9 @@ public:
 	// Weapon Actions
 	//---------------
 	UFUNCTION(BlueprintCallable)
+	void SetWantsAim(const bool NewValue);
+
+	UFUNCTION(BlueprintCallable)
 	void AttackEnded();
 
 	UFUNCTION()
@@ -206,7 +209,19 @@ public:
 	void AimStay();
 
 	UFUNCTION()
-	void PerformSecondaryWeaponAction();
+	void StopAim();
+
+	UFUNCTION()
+	void PrimaryAttackAnimation();
+
+	UFUNCTION()
+	void SecondaryAttackAnimation();
+
+	UFUNCTION()
+	void PrimaryAttackNotification();
+
+	UFUNCTION()
+	void SecondaryAttackNotification();
 
 	//-------
 	// Others
@@ -243,23 +258,11 @@ protected:
 	void PrimaryAttackInput();
 
 	UFUNCTION()
-	void PrimaryAttackAction();
+	void SecondaryAttackInput_Start();
 
 	UFUNCTION()
-	void AimInput();
-
-	UFUNCTION()
-	void StopAimInput();
-
-	UFUNCTION()
-	void StartAim();
-
-	UFUNCTION()
-	void StopAim();
-
-	UFUNCTION()
-	void SecondaryAttackAction();
-
+	void SecondaryAttackInput_Stop();
+	
 	//-------------
 	// Initializers
 	//-------------
@@ -270,7 +273,8 @@ private:
 //======================================
 //Private Pointers, Variables and Fields
 //======================================
-
+	bool bWantsAim = false;
+	
 	UPROPERTY(VisibleAnywhere)
 	AOmniItem* OverlappingItem = nullptr;
 
@@ -294,5 +298,4 @@ private:
 //=================
 	
 	void InitHUD() const;
-	
 };
