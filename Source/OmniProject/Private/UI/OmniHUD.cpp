@@ -38,14 +38,6 @@ UOmniHUDController* AOmniHUD::GetHUDController() const
 void AOmniHUD::ToggleReticle(bool ReticleEnabled)
 {
 	ReticleWidget->SetReticleEnabled(ReticleEnabled);
-	if (ReticleEnabled)
-	{
-		PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Reticle Enabled"));
-	}
-	else
-	{
-		PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Reticle Disabled"));
-	}
 }
 
 void AOmniHUD::TrySetupCharacter()

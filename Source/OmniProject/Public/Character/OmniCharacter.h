@@ -298,4 +298,6 @@ private:
 //=================
 	
 	void InitHUD() const;
+
+	bool IsAimAnimationPlaying() const;
 };

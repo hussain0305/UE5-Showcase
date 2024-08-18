@@ -108,6 +108,25 @@ void AOmniCharacter::SetWantsAim(const bool NewValue)
 	}
 }
 
+bool AOmniCharacter::IsAimAnimationPlaying() const
+{
+	if (!GetInventory() || !GetInventory()->GetWieldedWeapon())
+	{
+		return false;
+	}
+	FOmniWeaponTable WeaponConfig = GetInventory()->GetWieldedWeapon()->GetWeaponConfig();
+	if (!OmniAnimInstance)
+	{
+		return false;
+	}
+	if (UAnimMontage* CurrentMontage = OmniAnimInstance->GetCurrentActiveMontage())
+	{
+		FName CurrentSectionName = OmniAnimInstance->Montage_GetCurrentSection(CurrentMontage);
+		return CurrentSectionName == WeaponConfig.SecondaryAttackMontageSectionName_Phase1 || CurrentSectionName == WeaponConfig.SecondaryAttackMontageSectionName_Phase2;
+	}
+	return false;
+}
+
 UAbilitySystemComponent* AOmniCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -196,13 +215,11 @@ void AOmniCharacter::HandleWeapon()
 			const TObjectPtr<AOmniWeapon> WeaponToDrop = GetInventory()->GetWeaponOfTypeInInventory(OverlappingWeapon->WeaponType);
 			if(WeaponToDrop != nullptr)
 			{
-				PRINT_DEBUG_MESSAGE_WITH_PARAMETER(5.f, FColor::Emerald, FString("Droping "), WeaponToDrop->GetName());
 				DropWeapon(WeaponToDrop);
 			}
 		}
 		if(GetInventory()->GetIsWieldingWeaponOfDifferentType(OverlappingWeapon->WeaponType))
 		{
-			PRINT_DEBUG_MESSAGE_WITH_PARAMETER(5.f, FColor::Emerald, FString("Sheathing "), GetInventory()->GetWieldedWeapon()->GetName());
 			SheathWeapon();
 		}
 		EquipWeapon(WeaponToPickup);
@@ -471,9 +488,9 @@ void AOmniCharacter::SecondaryAttackInput_Start()
 
 void AOmniCharacter::SecondaryAttackInput_Stop()
 {
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Released"));
 	SetWantsAim(false);
-	if(GetIsAiming())
+	FString t = bWantsAim?"True":"False";
+	if(IsAimAnimationPlaying())
 	{
 		StopAim();
 	}
@@ -481,6 +498,15 @@ void AOmniCharacter::SecondaryAttackInput_Stop()
 
 void AOmniCharacter::AimStay()
 {
+	if(!bWantsAim)
+	{
+		if(IsAimAnimationPlaying())
+		{
+			StopAim();
+		}
+		return;
+	}
+
 	const TObjectPtr<AOmniWeapon> WieldedWeapon = GetInventory()->GetWieldedWeapon();
 	const FOmniWeaponTable WeaponConfig = WieldedWeapon->GetWeaponConfig();
 	const FAnimationDetails SecondaryAttackMontageDetails = WeaponConfig.SecondaryAttack;

@@ -160,7 +160,6 @@ void AOmniWeapon::AssertWeaponConfig()
 	{
 		if (GameMode->GetWeaponConfiguration(WeaponID, WeaponType, WeaponConfig))
 		{
-			PRINT_DEBUG_MESSAGE(5.f, FColor::Purple, FString("Weapon Config FETCHED!!!"));
 			WeaponConfigFetched = true;
 		}
 	}
