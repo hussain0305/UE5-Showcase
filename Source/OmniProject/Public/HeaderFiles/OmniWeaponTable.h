@@ -2,45 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
+#include "OmniGlobal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Engine/DataTable.h"
 #include "OmniWeaponTable.generated.h"
 
-UENUM(BlueprintType)
-enum class EAnimationBodyPart : uint8
-{
-	FullBody	UMETA(DisplayName = "Full Body"),
-	UpperBody	UMETA(DisplayName = "Upper Body"),
-	LowerBody	UMETA(DisplayName = "Lower Body"),
-};
-
-UENUM(BlueprintType)
-enum class EAttackSelection : uint8
-{
-	Randomized		UMETA(DisplayName = "Randomized"),
-	Combo			UMETA(DisplayName = "Combo"),
-	StateBased		UMETA(DisplayName = "StateBased")
-};
-
-UENUM(BlueprintType)
-enum class ESecondaryAttack : uint8
-{
-	NotApplicable		UMETA(DisplayName = "NotApplicable"),
-	Aimed				UMETA(DisplayName = "Aimed"),
-	RegularAttack		UMETA(DisplayName = "RegularAttack")
-};
-
-USTRUCT(BlueprintType)
-struct FAnimationDetails
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimMontage* AnimationMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EAnimationBodyPart BodyPart;
-};
 
 USTRUCT(BlueprintType)
 struct FOmniWeaponTable : public FTableRowBase
@@ -78,17 +44,17 @@ struct FOmniWeaponTable : public FTableRowBase
 	uint8 FallingAttackSectionNumber;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack")
-	ESecondaryAttack SecondaryAttackType;
+	EAttackType SecondaryAttackType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack", meta = (EditCondition = "SecondaryAttackType != ESecondaryAttack::NotApplicable", EditConditionHides))
 	FAnimationDetails SecondaryAttack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack", meta = (EditCondition = "SecondaryAttackType == ESecondaryAttack::Aimed", EditConditionHides))
-	FName SecondaryAttackMontageSectionName_Phase1;
+	FName SecondaryAttackMontageSectionName_PrepStart;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack", meta = (EditCondition = "SecondaryAttackType == ESecondaryAttack::Aimed", EditConditionHides))
-	FName SecondaryAttackMontageSectionName_Phase2;
+	FName SecondaryAttackMontageSectionName_Prepped;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Secondary Attack", meta = (EditCondition = "SecondaryAttackType == ESecondaryAttack::Aimed", EditConditionHides))
-	FName SecondaryAttackMontageSectionName_Phase3;
+	FName SecondaryAttackMontageSectionName_Attack;
 };

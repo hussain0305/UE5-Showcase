@@ -33,16 +33,17 @@ public:
 	FORCEINLINE bool GetWieldedWeaponDropped(const TObjectPtr<AOmniWeapon> DroppedWeapon) const {return CurrentlyWieldedWeapon != nullptr && CurrentlyWieldedWeapon == DroppedWeapon;}
 	FORCEINLINE TObjectPtr<AOmniWeapon> GetWeaponOfTypeInInventory(const EWeaponType WeaponType) const {return (WeaponType == EWeaponType::OneHandedWeapon ? OneHandedWeapon : TwoHandedWeapon);}
 	FORCEINLINE TObjectPtr<AOmniWeapon> GetWieldedWeapon() const {return CurrentlyWieldedWeapon;}
-
+	
 	void SetWeaponInInventory(TObjectPtr<AOmniWeapon> Weapon);
 	void SetWeaponInInventory(EWeaponType WeaponType, TObjectPtr<AOmniWeapon> Weapon);
 private:
 	
 	UPROPERTY(VisibleAnywhere)
-		TObjectPtr<AOmniWeapon> OneHandedWeapon;
-	UPROPERTY(VisibleAnywhere)
-		TObjectPtr<AOmniWeapon> TwoHandedWeapon;
-	UPROPERTY(VisibleAnywhere)
-		TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon;
+	TObjectPtr<AOmniWeapon> OneHandedWeapon;
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AOmniWeapon> TwoHandedWeapon;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AOmniWeapon> CurrentlyWieldedWeapon;
 };

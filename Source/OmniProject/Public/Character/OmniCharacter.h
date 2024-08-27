@@ -137,13 +137,14 @@ public:
 	FORCEINLINE void SetCharacterActionState(const ECharacterActionState NewActionState) { CharacterActionState = NewActionState;}
 	FORCEINLINE bool GetCanPerformPrimaryWeaponAction() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped && !GetIsInSecondaryAttackLoop();}
 	FORCEINLINE bool GetCanAim() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
-	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::AimStay_SecondaryAction;}
-	FORCEINLINE bool GetStartedAiming() const { return CharacterActionState == ECharacterActionState::AimStart_SecondaryAction;}
-	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::AimStay_SecondaryAction && CharacterWieldState != ECharacterWieldState::Unequipped;}
+	FORCEINLINE bool GetIsAiming() const { return CharacterActionState == ECharacterActionState::AttackPrepped;}
+	FORCEINLINE bool GetStartedAiming() const { return CharacterActionState == ECharacterActionState::PreppingAttack;}
+	FORCEINLINE bool GetCanPerformSecondaryWeaponAction() const { return CharacterActionState == ECharacterActionState::AttackPrepped && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanSheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle && CharacterWieldState != ECharacterWieldState::Unequipped;}
 	FORCEINLINE bool GetCanUnsheathWeapon() const { return CharacterActionState == ECharacterActionState::Idle;}
-	FORCEINLINE bool GetIsInSecondaryAttackLoop() const { return CharacterActionState == ECharacterActionState::AimStart_SecondaryAction || CharacterActionState == ECharacterActionState::AimStay_SecondaryAction;}
-	
+	FORCEINLINE bool GetIsInSecondaryAttackLoop() const { return CharacterActionState == ECharacterActionState::PreppingAttack || CharacterActionState == ECharacterActionState::AttackPrepped;}
+	FORCEINLINE bool GetWantsAim() const { return bWantsAim;}
+
 	//---------------
 	// Ability System
 	//---------------
@@ -205,24 +206,6 @@ public:
 	UFUNCTION()
 	void DropWeapon(AOmniWeapon* WeaponToDrop);
 
-	UFUNCTION()
-	void AimStay();
-
-	UFUNCTION()
-	void StopAim();
-
-	UFUNCTION()
-	void PrimaryAttackAnimation();
-
-	UFUNCTION()
-	void SecondaryAttackAnimation();
-
-	UFUNCTION()
-	void PrimaryAttackNotification();
-
-	UFUNCTION()
-	void SecondaryAttackNotification();
-
 	//-------
 	// Others
 	//-------
@@ -255,7 +238,10 @@ protected:
 	void ToggleSheath(EWeaponType WeaponType);
 
 	UFUNCTION()
-	void PrimaryAttackInput();
+	void PrimaryAttackInput_Start();
+
+	UFUNCTION()
+	void PrimaryAttackInput_Stop();
 
 	UFUNCTION()
 	void SecondaryAttackInput_Start();
@@ -298,6 +284,4 @@ private:
 //=================
 	
 	void InitHUD() const;
-
-	bool IsAimAnimationPlaying() const;
 };

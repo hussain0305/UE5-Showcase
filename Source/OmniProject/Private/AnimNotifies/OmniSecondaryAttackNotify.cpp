@@ -10,11 +10,18 @@ void UOmniSecondaryAttackNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
+	/* Saved the Character logic in case we need to do something there
 	if (AActor* Owner = MeshComp->GetOwner())
 	{
 		if (AOmniCharacter* OmniCharacter = Cast<AOmniCharacter>(Owner))
 		{
 			OmniCharacter->SecondaryAttackNotification();
 		}
+	}
+	*/
+	
+	if (OnSecondaryAttackNotify.IsBound())
+	{
+		OnSecondaryAttackNotify.Broadcast();
 	}
 }

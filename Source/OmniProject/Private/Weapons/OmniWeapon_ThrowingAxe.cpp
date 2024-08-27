@@ -7,7 +7,6 @@
 
 void AOmniWeapon_ThrowingAxe::StartThrowTrajectory(const FVector Origin, const FVector Target, const FVector FinalRotation, const TArray<AActor*> IgnoreActors)
 {
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Black, FString("StartThrowTrajectory"));
 	TrajectoryStart = Origin;
 	TrajectoryEnd = Target;
 	HitNormal = FinalRotation;

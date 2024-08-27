@@ -7,16 +7,41 @@
 #include "HeaderFiles/OmniWeaponTable.h"
 #include "OmniWeapon.generated.h"
 
+class UOmniAttack;
 class UStaticMeshComponent;
 class UBoxComponent;
 
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class OMNIPROJECT_API AOmniWeapon : public AOmniItem
 {
 	GENERATED_BODY()
 
 public:
 	AOmniWeapon();
+//=============
+//Weapon Config
+//=============
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Config")
+	FName WeaponID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Config")
+	FAnimationDetails SheathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Config")
+	FAnimationDetails UnsheathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Config|Primary Attack")
+	EAttackType PrimaryAttackType;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Config|Primary Attack", meta = (EditCondition = "PrimaryAttackType != EAttackType::NotApplicable", EditConditionHides))
+	FAttackConfiguration PrimaryAttack;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Config|Secondary Attack")
+	EAttackType SecondaryAttackType;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Config|Secondary Attack", meta = (EditCondition = "SecondaryAttackType != EAttackType::NotApplicable", EditConditionHides))
+	FAttackConfiguration SecondaryAttack;
 
 //=====================================
 //Public Pointers, Variables and Fields
@@ -27,10 +52,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
 	EWeaponType WeaponType;
-
-	UPROPERTY(EditDefaultsOnly, Category= "Weapon Details")
-	FName WeaponID;
-
+	
 	//-----------------
 	// Weapon Hit Trace
 	//-----------------
@@ -53,11 +75,9 @@ public:
 //Functions
 //=========
 
-	//---------------
-	// Action Helpers
-	//---------------
-	FORCEINLINE void SetIsWeaponAttacking(const bool Attacking) { bIsAttacking = Attacking;}
-	FORCEINLINE bool GetIsWeaponAttacking() const {return bIsAttacking;}
+	//--------------------
+	// Getters and Setters
+	//--------------------
 
 	//-------
 	// Others
@@ -66,18 +86,33 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void ProcessPrimaryInput_Start();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ProcessPrimaryInput_Stop();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ProcessSecondaryInput_Start();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ProcessSecondaryInput_Stop();
 
 	UFUNCTION(BlueprintCallable)
 	FOmniWeaponTable GetWeaponConfig();
 
-	virtual void Secondary_PreAttack(TObjectPtr<class AOmniCharacter> OwningCharacter);
-	virtual void Secondary_DoAttack(TObjectPtr<class AOmniCharacter> OwningCharacter);
-	virtual void Secondary_PostAttack(TObjectPtr<class AOmniCharacter> OwningCharacter);
-
-protected:
-
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable)
+	void SetInputConsumers(EWeaponAction Primary, EWeaponAction Secondary);
 	
+protected:
+	
+	TObjectPtr<UOmniAttack> PrimaryInputConsumer;
+	TObjectPtr<UOmniAttack> SecondaryInputConsumer;
+	
+	virtual void BeginPlay() override;
+	void InitializeAttacks();
+
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
@@ -87,11 +122,6 @@ protected:
 	void AssertWeaponConfig();
 
 private:
-	//---------------------
-	// Weapon Configuration
-	//---------------------
-
 	FOmniWeaponTable WeaponConfig;
 	bool WeaponConfigFetched = false;
-	bool bIsAttacking = false;
 };

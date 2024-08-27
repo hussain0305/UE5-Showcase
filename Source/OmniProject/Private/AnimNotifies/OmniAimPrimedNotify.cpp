@@ -3,18 +3,15 @@
 
 #include "AnimNotifies/OmniAimPrimedNotify.h"
 #include "Character/OmniCharacter.h"
+#include "HeaderFiles/DebugMacros.h"
 
 void UOmniAimPrimedNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                   const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	if (AActor* Owner = MeshComp->GetOwner())
+	if (OnAimPrimedNotify.IsBound())
 	{
-		if (AOmniCharacter* OmniCharacter = Cast<AOmniCharacter>(Owner))
-		{
-			OmniCharacter->AimStay();
-		}
+		OnAimPrimedNotify.Broadcast();
 	}
-
 }

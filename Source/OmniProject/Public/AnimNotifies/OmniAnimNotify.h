@@ -6,9 +6,6 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "OmniAnimNotify.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class OMNIPROJECT_API UOmniAnimNotify : public UAnimNotify
 {

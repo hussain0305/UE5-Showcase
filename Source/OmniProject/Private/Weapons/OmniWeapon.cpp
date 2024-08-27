@@ -1,4 +1,8 @@
 #include "Weapons/OmniWeapon.h"
+
+#include "OmniAttackFactory.h"
+#include "Attacks/OmniAttack.h"
+#include "Character/OmniAnimInstance.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "Character/OmniCharacter.h"
 #include "Components/BoxComponent.h"
@@ -27,8 +31,27 @@ AOmniWeapon::AOmniWeapon()
 void AOmniWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	WeaponBox->OnComponentBeginOverlap.AddDynamic(this, &AOmniWeapon::OnBoxBeginOverlap);
+
+	InitializeAttacks();
+}
+
+void AOmniWeapon::InitializeAttacks()
+{
+	UOmniAttackFactory* AttackFactory = NewObject<UOmniAttackFactory>(this);
+	if (PrimaryAttack.AttackClass)
+	{
+		PrimaryAttack.Attack = AttackFactory->CreateAttackInstance(PrimaryAttack.AttackClass, this);
+		PrimaryAttack.Attack->InitializeAttack();
+	}
+	if (SecondaryAttack.AttackClass)
+	{
+		SecondaryAttack.Attack = AttackFactory->CreateAttackInstance(SecondaryAttack.AttackClass, this);
+		SecondaryAttack.Attack->InitializeAttack();
+	}
+
+	SetInputConsumers(EWeaponAction::PrimaryAttack, EWeaponAction::SecondaryAttack);
 }
 
 void AOmniWeapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -107,29 +130,68 @@ void AOmniWeapon::SetItemState(const EItemState NewState)
 	case EItemState::Pickup:
 		WeaponBox->SetCollisionProfileName(WEAPON_PICKUP_PROFILE);
 		break;
+	case EItemState::Thrown:
+		break;
 	}
 }
 
 int32 AOmniWeapon::GetMontageSectionToPlay(ECharacterLocomotionState LocomotionState)
 {
-	if(WeaponConfig.PrimaryAttackType == EAttackSelection::StateBased)
+	return 1;
+	// if(WeaponConfig.PrimaryAttackType == EAttackSelection::StateBased)
+	// {
+	// 	switch (LocomotionState)
+	// 	{
+	// 	case ECharacterLocomotionState::Stationary:
+	// 		return WeaponConfig.RunningAttackSectionNumber;
+	//
+	// 	case ECharacterLocomotionState::Falling:
+	// 		return WeaponConfig.FallingAttackSectionNumber;
+	// 		
+	// 	case ECharacterLocomotionState::Running:
+	// 		return WeaponConfig.RunningAttackSectionNumber;
+	//
+	// 	default:
+	// 		return FMath::RandRange(1,WeaponConfig.NumSections);
+	// 	}
+	// }
+	// return FMath::RandRange(1,WeaponConfig.NumSections);
+}
+
+void AOmniWeapon::ProcessPrimaryInput_Start()
+{
+	if (!PrimaryInputConsumer)
 	{
-		switch (LocomotionState)
-		{
-		case ECharacterLocomotionState::Stationary:
-			return WeaponConfig.RunningAttackSectionNumber;
-
-		case ECharacterLocomotionState::Falling:
-			return WeaponConfig.FallingAttackSectionNumber;
-			
-		case ECharacterLocomotionState::Running:
-			return WeaponConfig.RunningAttackSectionNumber;
-
-		default:
-			return FMath::RandRange(1,WeaponConfig.NumSections);
-		}
+		return;
 	}
-	return FMath::RandRange(1,WeaponConfig.NumSections);
+	PrimaryInputConsumer->ProcessPrimaryInput_Start(GetWielder(), this);
+}
+
+void AOmniWeapon::ProcessPrimaryInput_Stop()
+{
+	if (!PrimaryInputConsumer)
+	{
+		return;
+	}
+	PrimaryInputConsumer->ProcessPrimaryInput_Stop(GetWielder(), this);
+}
+
+void AOmniWeapon::ProcessSecondaryInput_Start()
+{
+	if (!SecondaryInputConsumer)
+	{
+		return;
+	}
+	SecondaryInputConsumer->ProcessSecondaryInput_Start(GetWielder(), this);
+}
+
+void AOmniWeapon::ProcessSecondaryInput_Stop()
+{
+	if (!SecondaryInputConsumer)
+	{
+		return;
+	}
+	SecondaryInputConsumer->ProcessSecondaryInput_Stop(GetWielder(), this);
 }
 
 FOmniWeaponTable AOmniWeapon::GetWeaponConfig()
@@ -138,16 +200,31 @@ FOmniWeaponTable AOmniWeapon::GetWeaponConfig()
 	return WeaponConfig;
 }
 
-void AOmniWeapon::Secondary_PreAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
+void AOmniWeapon::SetInputConsumers(EWeaponAction Primary, EWeaponAction Secondary)
 {
-}
+	switch(Primary)
+	{
+		case EWeaponAction::PrimaryAttack:
+			PrimaryInputConsumer = PrimaryAttack.Attack;
+			break;
+		case EWeaponAction::SecondaryAttack:
+			PrimaryInputConsumer = SecondaryAttack.Attack;
+			break;
+		case EWeaponAction::CallThrownWeapon:
+			break;
+	}
+	switch(Secondary)
+	{
+		case EWeaponAction::PrimaryAttack:
+			SecondaryInputConsumer = PrimaryAttack.Attack;
+			break;
+		case EWeaponAction::SecondaryAttack:
+			SecondaryInputConsumer = SecondaryAttack.Attack;
+			break;
+		case EWeaponAction::CallThrownWeapon:
+			break;
+	}
 
-void AOmniWeapon::Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
-{
-}
-
-void AOmniWeapon::Secondary_PostAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
-{
 }
 
 void AOmniWeapon::AssertWeaponConfig()
@@ -164,4 +241,3 @@ void AOmniWeapon::AssertWeaponConfig()
 		}
 	}
 }
-

@@ -50,9 +50,11 @@ public:
 //==================================
 
 	UFUNCTION(BlueprintCallable)
-		FORCEINLINE EItemState GetItemState() const { return ItemState; }
+	FORCEINLINE EItemState GetItemState() const { return ItemState; }
+
 	UFUNCTION(BlueprintCallable)
-		FORCEINLINE bool IsPickup() const { return ItemState == EItemState::Pickup; }
+	FORCEINLINE bool IsPickup() const { return ItemState == EItemState::Pickup; }
+
 	FORCEINLINE AOmniCharacter* GetWielder() const {return Wielder; }
 	FORCEINLINE void SetWielder(AOmniCharacter* NewWielder) {Wielder = NewWielder; }
 	
@@ -60,30 +62,33 @@ protected:
 
 	virtual void BeginPlay() override;	
 	virtual void Tick(float DeltaTime) override;
+
 	UFUNCTION(BlueprintPure, Category = "Item Presentation")
-		float TransformedSin();
+	float TransformedSin();
+
 	UFUNCTION(BlueprintPure, Category = "Item Presentation")
-		float TransformedCos();
+	float TransformedCos();
+
 	UFUNCTION()
-		virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	UFUNCTION()
-		virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	UFUNCTION()
-		virtual void RoutineAsAPickup();
+	virtual void RoutineAsAPickup();
+
+	UPROPERTY(VisibleAnywhere)
+	AOmniCharacter* Wielder;
 
 private:
-
 	
-
 //=====================================
 //Public Pointers, Variables and Fields
 //=====================================
 
 	EItemState ItemState = EItemState::Pickup;
-
-	UPROPERTY(VisibleAnywhere)
-		AOmniCharacter* Wielder;
-
+	
 	//--------------
 	// Functionality
 	//--------------

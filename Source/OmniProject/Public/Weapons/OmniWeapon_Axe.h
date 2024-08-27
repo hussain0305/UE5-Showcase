@@ -17,13 +17,18 @@ class OMNIPROJECT_API AOmniWeapon_Axe : public AOmniWeapon
 
 public:
 
+	virtual void BeginPlay() override;
+	
 	UPROPERTY(EditDefaultsOnly)
 	float ThrowRange = 10000;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AOmniWeapon_ThrowingAxe> ThrowingAxe;
 
-	virtual void Secondary_PreAttack(TObjectPtr<AOmniCharacter> OwningCharacter) override;
-	
-	virtual void Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharacter) override;
+	UFUNCTION()
+	void ReleaseAxe();
+
+private:
+
+	void SubscribeToBroadcasts();
 };

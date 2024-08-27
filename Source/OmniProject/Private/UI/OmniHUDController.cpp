@@ -21,7 +21,6 @@ void UOmniHUDController::InitController(FOmniWidgetControllerParams& ControllerP
 
 void UOmniHUDController::BroadcastInitialValues() const
 {
-	PRINT_DEBUG_MESSAGE(5, FColor::Green, FString("Broadcasting Initial Values"));
 	OnHealthChanged.Broadcast(AttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(AttributeSet->GetMaxHealth());
 }

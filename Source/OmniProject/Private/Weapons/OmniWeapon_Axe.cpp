@@ -3,31 +3,30 @@
 
 #include "Weapons/OmniWeapon_Axe.h"
 
+#include "AnimNotifies/OmniSecondaryAttackNotify.h"
+#include "Attacks/OmniAttack.h"
 #include "Character/OmniCharacter.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "Weapons/OmniWeapon_ThrowingAxe.h"
 
-void AOmniWeapon_Axe::Secondary_PreAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
+void AOmniWeapon_Axe::BeginPlay()
 {
-	Super::Secondary_PreAttack(OwningCharacter);
-	
-	OwningCharacter->SetCharacterActionState(ECharacterActionState::AimStart_SecondaryAction);
-	OwningCharacter->SetWantsAim(true);
+	Super::BeginPlay();
+
+	SubscribeToBroadcasts();
 }
 
-void AOmniWeapon_Axe::Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharacter)
+void AOmniWeapon_Axe::ReleaseAxe()
 {
-	Super::Secondary_DoAttack(OwningCharacter);
-
 	FVector Origin, Target, HitNormal;
-	APlayerController* PlayerController = Cast<APlayerController>(OwningCharacter->GetController());
+	APlayerController* PlayerController = Cast<APlayerController>(GetWielder()->GetController());
 	Origin = PlayerController->PlayerCameraManager->GetCameraLocation();
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());
 	CollisionParams.AddIgnoredActor(this);
-	CollisionParams.AddIgnoredActor(OwningCharacter);
+	CollisionParams.AddIgnoredActor(GetWielder());
 	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(OwningCharacter);
+	IgnoredActors.Add(GetWielder());
 	IgnoredActors.Add(this);
 	
 	if (PlayerController)
@@ -66,7 +65,7 @@ void AOmniWeapon_Axe::Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharac
 		FRotator SpawnRotation = GetActorRotation();
 		FActorSpawnParameters SpawnParams;
 
-		SpawnParams.Owner = OwningCharacter;
+		SpawnParams.Owner = GetWielder();
 		SpawnParams.Instigator = GetInstigator();
 
 		if (AActor* SpawnedActor = World->SpawnActor<AActor>(ThrowingAxe, SpawnLocation, SpawnRotation, SpawnParams))
@@ -74,6 +73,25 @@ void AOmniWeapon_Axe::Secondary_DoAttack(TObjectPtr<AOmniCharacter> OwningCharac
 			AOmniWeapon_ThrowingAxe* ThrownAxe = Cast<AOmniWeapon_ThrowingAxe>(SpawnedActor);
 			ThrownAxe->StartThrowTrajectory(Origin, Target, HitNormal, IgnoredActors);
 			ThrownAxe->SetItemState(EItemState::Thrown);
+			SetItemState(EItemState::Thrown);
 		}
 	}
+}
+
+void AOmniWeapon_Axe::SubscribeToBroadcasts()
+{
+	if (SecondaryAttack.Attack && SecondaryAttack.Attack->AttackDetails.AnimationMontage)
+	{
+		UAnimMontage* AnimMontage = SecondaryAttack.Attack->AttackDetails.AnimationMontage;
+
+		for (const TArray<FAnimNotifyEvent>& NotifyEvents = AnimMontage->Notifies; const FAnimNotifyEvent& Event : NotifyEvents)
+		{
+			if (UOmniSecondaryAttackNotify* NotifyInstance = Cast<UOmniSecondaryAttackNotify>(Event.Notify))
+			{
+				NotifyInstance->OnSecondaryAttackNotify.AddDynamic(this, &AOmniWeapon_Axe::ReleaseAxe);
+				break;
+			}
+		}
+	}
+
 }
