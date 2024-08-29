@@ -121,6 +121,9 @@ protected:
 
 	void AssertWeaponConfig();
 
+	UPROPERTY()
+	bool bInputOverride = false;
+
 private:
 	FOmniWeaponTable WeaponConfig;
 	bool WeaponConfigFetched = false;

@@ -202,6 +202,7 @@ FOmniWeaponTable AOmniWeapon::GetWeaponConfig()
 
 void AOmniWeapon::SetInputConsumers(EWeaponAction Primary, EWeaponAction Secondary)
 {
+	bInputOverride = false;
 	switch(Primary)
 	{
 		case EWeaponAction::PrimaryAttack:
@@ -211,6 +212,7 @@ void AOmniWeapon::SetInputConsumers(EWeaponAction Primary, EWeaponAction Seconda
 			PrimaryInputConsumer = SecondaryAttack.Attack;
 			break;
 		case EWeaponAction::CallThrownWeapon:
+			bInputOverride = true;
 			break;
 	}
 	switch(Secondary)
@@ -222,9 +224,9 @@ void AOmniWeapon::SetInputConsumers(EWeaponAction Primary, EWeaponAction Seconda
 			SecondaryInputConsumer = SecondaryAttack.Attack;
 			break;
 		case EWeaponAction::CallThrownWeapon:
+			bInputOverride = true;
 			break;
 	}
-
 }
 
 void AOmniWeapon::AssertWeaponConfig()

@@ -15,7 +15,8 @@ class OMNIPROJECT_API UOmniAttack_AimAndThrow : public UOmniAttack
 	GENERATED_BODY()
 	
 public:
-
+	FORCEINLINE void SetIsRecallingWeapon(const bool Recalling) {bRecallingWeapon = Recalling; }
+	
 	virtual void InitializeAttack() override;
 	
 	virtual void ProcessPrimaryInput_Start(AOmniCharacter* Wielder, AOmniWeapon* Weapon) override;
@@ -33,6 +34,9 @@ public:
 	void StopAim();
 	void SubscribeToBroadcasts();
 
+	void RecallThrownWeaponAnimation();
+	void ThrownWeaponReceivedAnimation() const;
+	
 private:
 
 	UPROPERTY(VisibleAnywhere)
@@ -40,4 +44,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AOmniWeapon> Weapon_Cached;
+
+	bool bRecallingWeapon = false;
 };

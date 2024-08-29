@@ -28,7 +28,17 @@ public:
 	UFUNCTION()
 	void ReleaseAxe();
 
+	virtual void ProcessPrimaryInput_Start() override;
+
+	virtual void ProcessSecondaryInput_Start() override;
+
+	void RecallAxe();
+
+	void AxeRecallComplete();
 private:
 
 	void SubscribeToBroadcasts();
+
+	UPROPERTY()
+	TObjectPtr<AOmniWeapon_ThrowingAxe> ThrownAxe;
 };

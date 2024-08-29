@@ -15,7 +15,7 @@ void UOmniAttack_AimAndThrow::InitializeAttack()
 
 void UOmniAttack_AimAndThrow::ProcessPrimaryInput_Start(AOmniCharacter* Wielder, AOmniWeapon* Weapon)
 {
-	Weapon->SetInputConsumers(EWeaponAction::PrimaryAttack, EWeaponAction::SecondaryAttack);
+	//Weapon Throw
 	if (!Wielder->GetIsAiming())
 	{
 		return;
@@ -73,7 +73,8 @@ void UOmniAttack_AimAndThrow::ProcessSecondaryInput_Stop(AOmniCharacter* Wielder
 
 void UOmniAttack_AimAndThrow::SecondaryAttackPrepped()
 {
-	if(!Wielder_Cached->GetWantsAim())
+	//TODO: Better way to do this? Flag variables are no bueno, think about better, more robust design
+	if(!bRecallingWeapon && !Wielder_Cached->GetWantsAim())
 	{
 		if(IsAimAnimationPlaying())
 		{
@@ -92,7 +93,7 @@ void UOmniAttack_AimAndThrow::SecondaryAttackPrepped()
 		WielderAnimInstance->Montage_Play(SecondaryActionMontage);
 		WielderAnimInstance->Montage_JumpToSection(RangedAttackMontageSectionName_Prepped, SecondaryActionMontage);
 		WielderAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
-		Wielder_Cached->SetCharacterActionState(ECharacterActionState::AttackPrepped);
+		Wielder_Cached->SetCharacterActionState(bRecallingWeapon ? ECharacterActionState::OtherAction : ECharacterActionState::AttackPrepped);
 	}
 }
 
@@ -108,7 +109,6 @@ bool UOmniAttack_AimAndThrow::IsAimAnimationPlaying() const
 	}
 	return false;
 }
-
 
 void UOmniAttack_AimAndThrow::StopAim()
 {
@@ -131,6 +131,46 @@ void UOmniAttack_AimAndThrow::StopAim()
 	}
 }
 
+void UOmniAttack_AimAndThrow::RecallThrownWeaponAnimation()
+{
+	if (!Weapon_Cached || !Wielder_Cached || bRecallingWeapon)
+	{
+		return;
+	}
+	bRecallingWeapon = true;
+	TObjectPtr<UOmniAnimInstance> WielderAnimInstance = Wielder_Cached->GetOmniAnimInstance();
+	WielderAnimInstance->AnimatedBodyPart =  AttackDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = AttackDetails.AnimationMontage;
+	
+	if (WielderAnimInstance && SecondaryActionMontage)
+	{
+		Wielder_Cached->SetCharacterActionState(ECharacterActionState::OtherAction);
+		SecondaryActionMontage->bLoop = false;
+		WielderAnimInstance->Montage_Play(SecondaryActionMontage);
+		WielderAnimInstance->Montage_JumpToSection(RangedAttackMontageSectionName_PrepStart, SecondaryActionMontage);
+		WielderAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, 1.f);
+	}
+}
+
+void UOmniAttack_AimAndThrow::ThrownWeaponReceivedAnimation() const
+{
+	if (!Weapon_Cached || !Wielder_Cached)
+	{
+		return;
+	}
+	TObjectPtr<UOmniAnimInstance> WielderAnimInstance = Wielder_Cached->GetOmniAnimInstance();
+	WielderAnimInstance->AnimatedBodyPart =  AttackDetails.BodyPart;
+	UAnimMontage* SecondaryActionMontage = AttackDetails.AnimationMontage;
+	
+	if (WielderAnimInstance && SecondaryActionMontage)
+	{
+		SecondaryActionMontage->bLoop = false;
+		WielderAnimInstance->Montage_Play(SecondaryActionMontage);
+		WielderAnimInstance->Montage_JumpToSection(RangedAttackMontageSectionName_PrepStart, SecondaryActionMontage);
+		WielderAnimInstance->Montage_SetPlayRate(SecondaryActionMontage, -1.f);
+		Wielder_Cached->SetCharacterActionState(ECharacterActionState::Idle);
+	}
+}
 
 void UOmniAttack_AimAndThrow::SubscribeToBroadcasts()
 {
@@ -147,7 +187,6 @@ void UOmniAttack_AimAndThrow::SubscribeToBroadcasts()
 			}
 		}
 	}
-
 }
 
 

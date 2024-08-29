@@ -6,6 +6,7 @@
 #include "Weapons/OmniWeapon.h"
 #include "OmniWeapon_ThrowingAxe.generated.h"
 
+class AOmniWeapon_Axe;
 /**
  * 
  */
@@ -15,13 +16,23 @@ class OMNIPROJECT_API AOmniWeapon_ThrowingAxe : public AOmniWeapon
 	GENERATED_BODY()
 
 public:
-	
-	void StartThrowTrajectory(const FVector Origin, const FVector Target, const FVector FinalRotation, const TArray<AActor*> IgnoreActors);
+
+	//----------
+	// Axe Throw
+	//----------
+	void StartThrowTrajectory(const FVector Origin, const FVector Target, const FVector FinalRotation, const TArray<AActor*> IgnoreActors, const TObjectPtr<AOmniWeapon_Axe> OwnerWeaponParam);
 	void ThrowTrajectory();
 	FVector ComputeAxeThrowBezier(float t, FVector P0, FVector P1, FVector P2);
 	bool CheckForCollision();
 	FRotator CalculateLodgedRotation(const FVector& HitNormal) const;
-	
+
+	//-----------
+	// Ace Recall
+	//-----------
+	void StartRecallTrajectory();
+	void RecallTrajectory();
+	bool AxeReachedHand() const;
+
 	UPROPERTY(EditDefaultsOnly)
 	float CurveStrength = 200.0f;
 
@@ -49,4 +60,7 @@ private:
 	
 	FTimerHandle AxeThrowTimerHandle;
 	TArray<AActor*> IgnoredActors;
+
+	UPROPERTY()
+	TObjectPtr<AOmniWeapon_Axe> OwnerWeapon;
 };

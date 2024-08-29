@@ -4,9 +4,11 @@
 #include "Weapons/OmniWeapon_ThrowingAxe.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Weapons/OmniWeapon_Axe.h"
 
-void AOmniWeapon_ThrowingAxe::StartThrowTrajectory(const FVector Origin, const FVector Target, const FVector FinalRotation, const TArray<AActor*> IgnoreActors)
+void AOmniWeapon_ThrowingAxe::StartThrowTrajectory(const FVector Origin, const FVector Target, const FVector FinalRotation, const TArray<AActor*> IgnoreActors, const TObjectPtr<AOmniWeapon_Axe> OwnerWeaponParam)
 {
+	OwnerWeapon = OwnerWeaponParam;
 	TrajectoryStart = Origin;
 	TrajectoryEnd = Target;
 	HitNormal = FinalRotation;
@@ -130,4 +132,56 @@ FRotator AOmniWeapon_ThrowingAxe::CalculateLodgedRotation(const FVector& tHitNor
 	FQuat FinalQuat = RotationAroundY * AlignQuat;
 
 	return FinalQuat.Rotator();
+}
+
+void AOmniWeapon_ThrowingAxe::StartRecallTrajectory()
+{
+	TrajectoryStart = GetActorLocation();
+	TrajectoryEnd = OwnerWeapon->GetActorLocation();
+	
+	Direction = (TrajectoryStart - TrajectoryEnd).GetSafeNormal();
+	RightVector = FVector::CrossProduct(Direction, FVector::UpVector).GetSafeNormal();
+	ControlPoint = TrajectoryStart + Direction * 0.5f * FVector::Dist(TrajectoryStart, TrajectoryEnd) - RightVector * CurveStrength;
+
+	Distance = FVector::Dist(TrajectoryStart, TrajectoryEnd);
+	TotalTime = Distance / ThrowSpeed;
+
+	ElapsedTime = 0.0f;
+	DRAW_LINE(TrajectoryStart, TrajectoryEnd);
+	DRAW_POINT(ControlPoint);
+	GetWorldTimerManager().SetTimer(AxeThrowTimerHandle, this, &AOmniWeapon_ThrowingAxe::RecallTrajectory, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void AOmniWeapon_ThrowingAxe::RecallTrajectory()
+{
+	ElapsedTime += GetWorld()->GetDeltaSeconds();
+
+	if (ElapsedTime >= TotalTime)
+	{
+		GetWorldTimerManager().ClearTimer(AxeThrowTimerHandle);
+		OwnerWeapon->AxeRecallComplete();
+		return;
+	}
+
+	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("RECALLING AXE"));
+	TrajectoryEnd = OwnerWeapon->GetActorLocation();
+	float t = ElapsedTime / TotalTime;
+
+	FVector NewPosition = ComputeAxeThrowBezier(t, TrajectoryStart, TrajectoryEnd, ControlPoint);
+
+	const float RotationAngle = RotationSpeed * GetWorld()->GetDeltaSeconds();
+	const FRotator NewRotation = FRotator(RotationAngle, 0, 0);
+	AddActorLocalRotation(NewRotation);
+	SetActorLocation(NewPosition);
+
+	if (AxeReachedHand())
+	{
+		GetWorldTimerManager().ClearTimer(AxeThrowTimerHandle);
+		OwnerWeapon->AxeRecallComplete();
+	}
+}
+
+bool AOmniWeapon_ThrowingAxe::AxeReachedHand() const
+{
+	return FVector::DistSquared(TrajectoryEnd, GetActorLocation()) < 20;
 }

@@ -2,9 +2,9 @@
 
 
 #include "Weapons/OmniWeapon_Axe.h"
-
 #include "AnimNotifies/OmniSecondaryAttackNotify.h"
 #include "Attacks/OmniAttack.h"
+#include "Attacks/OmniAttack_AimAndThrow.h"
 #include "Character/OmniCharacter.h"
 #include "HeaderFiles/DebugMacros.h"
 #include "Weapons/OmniWeapon_ThrowingAxe.h"
@@ -70,11 +70,59 @@ void AOmniWeapon_Axe::ReleaseAxe()
 
 		if (AActor* SpawnedActor = World->SpawnActor<AActor>(ThrowingAxe, SpawnLocation, SpawnRotation, SpawnParams))
 		{
-			AOmniWeapon_ThrowingAxe* ThrownAxe = Cast<AOmniWeapon_ThrowingAxe>(SpawnedActor);
-			ThrownAxe->StartThrowTrajectory(Origin, Target, HitNormal, IgnoredActors);
+			ThrownAxe = Cast<AOmniWeapon_ThrowingAxe>(SpawnedActor);
+			ThrownAxe->StartThrowTrajectory(Origin, Target, HitNormal, IgnoredActors, this);
 			ThrownAxe->SetItemState(EItemState::Thrown);
 			SetItemState(EItemState::Thrown);
 		}
+		SetActorHiddenInGame(true);
+		SetInputConsumers(EWeaponAction::CallThrownWeapon, EWeaponAction::CallThrownWeapon);
+	}
+}
+
+void AOmniWeapon_Axe::ProcessPrimaryInput_Start()
+{
+	if (bInputOverride)
+	{
+		RecallAxe();
+		return;
+	}
+	Super::ProcessPrimaryInput_Start();
+}
+
+void AOmniWeapon_Axe::ProcessSecondaryInput_Start()
+{
+	if (bInputOverride)
+	{
+		RecallAxe();
+		return;
+	}
+	Super::ProcessSecondaryInput_Start();
+}
+
+void AOmniWeapon_Axe::RecallAxe()
+{
+	if (!ThrownAxe)
+	{
+		return;
+	}
+	Cast<UOmniAttack_AimAndThrow>(SecondaryAttack.Attack)->RecallThrownWeaponAnimation();
+	ThrownAxe->StartRecallTrajectory();
+}
+
+void AOmniWeapon_Axe::AxeRecallComplete()
+{
+	SetActorHiddenInGame(false);
+	SetInputConsumers(EWeaponAction::PrimaryAttack, EWeaponAction::SecondaryAttack);
+	if(const TObjectPtr<UOmniAttack_AimAndThrow> RecallingAttack = Cast<UOmniAttack_AimAndThrow>(SecondaryAttack.Attack))
+	{
+		RecallingAttack->SetIsRecallingWeapon(false);
+		RecallingAttack->ThrownWeaponReceivedAnimation();
+	}
+	if (ThrownAxe)
+	{
+		ThrownAxe->Destroy();
+		ThrownAxe = nullptr;
 	}
 }
 
