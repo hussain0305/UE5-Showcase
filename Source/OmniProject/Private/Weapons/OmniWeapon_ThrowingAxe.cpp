@@ -22,8 +22,8 @@ void AOmniWeapon_ThrowingAxe::StartThrowTrajectory(const FVector Origin, const F
 	TotalTime = Distance / ThrowSpeed;
 
 	ElapsedTime = 0.0f;
-	DRAW_LINE(TrajectoryStart, TrajectoryEnd);
-	DRAW_POINT(ControlPoint);
+	// DRAW_LINE(TrajectoryStart, TrajectoryEnd);
+	// DRAW_POINT(ControlPoint);
 	GetWorldTimerManager().SetTimer(AxeThrowTimerHandle, this, &AOmniWeapon_ThrowingAxe::ThrowTrajectory, GetWorld()->GetDeltaSeconds(), true);
 }
 
@@ -144,11 +144,11 @@ void AOmniWeapon_ThrowingAxe::StartRecallTrajectory()
 	ControlPoint = TrajectoryStart + Direction * 0.5f * FVector::Dist(TrajectoryStart, TrajectoryEnd) - RightVector * CurveStrength;
 
 	Distance = FVector::Dist(TrajectoryStart, TrajectoryEnd);
-	TotalTime = Distance / ThrowSpeed;
+	TotalTime = Distance / RecallSpeed;
 
 	ElapsedTime = 0.0f;
-	DRAW_LINE(TrajectoryStart, TrajectoryEnd);
-	DRAW_POINT(ControlPoint);
+	// DRAW_LINE(TrajectoryStart, TrajectoryEnd);
+	// DRAW_POINT(ControlPoint);
 	GetWorldTimerManager().SetTimer(AxeThrowTimerHandle, this, &AOmniWeapon_ThrowingAxe::RecallTrajectory, GetWorld()->GetDeltaSeconds(), true);
 }
 
@@ -163,7 +163,6 @@ void AOmniWeapon_ThrowingAxe::RecallTrajectory()
 		return;
 	}
 
-	PRINT_DEBUG_MESSAGE(5.f, FColor::Red, FString("RECALLING AXE"));
 	TrajectoryEnd = OwnerWeapon->GetActorLocation();
 	float t = ElapsedTime / TotalTime;
 

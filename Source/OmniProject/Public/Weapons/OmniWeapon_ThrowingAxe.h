@@ -37,7 +37,10 @@ public:
 	float CurveStrength = 200.0f;
 
 	UPROPERTY(EditDefaultsOnly)
-	float ThrowSpeed = 4500.0f;
+	float ThrowSpeed = 4000.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RecallSpeed = 3000.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotationSpeed = -1800.0f;
